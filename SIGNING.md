@@ -138,13 +138,41 @@ Make sure the `KEYSTORE_FILE` environment variable points to the correct locatio
 
 Double-check your `KEYSTORE_PASSWORD` and `KEY_PASSWORD` environment variables.
 
+### Build fails with "No key with alias 'XXX' found in keystore"
+
+The `KEY_ALIAS` doesn't match what's in your keystore. To check which aliases are in your keystore:
+
+```bash
+keytool -list -v -keystore release.keystore
+```
+
+This will show you all aliases in the keystore. Make sure the `KEY_ALIAS` environment variable/GitHub Secret matches exactly (case-sensitive).
+
+**Common issue**: You might have created the keystore with a different alias than you're using now. When creating the keystore with `keytool -genkey`, the `-alias` parameter sets the alias name.
+
 ### GitHub Actions fails to build
 
-Check that all four secrets are correctly set in GitHub:
-- KEYSTORE_BASE64
-- KEYSTORE_PASSWORD
-- KEY_ALIAS
-- KEY_PASSWORD
+1. **Check that all four secrets are correctly set** in GitHub:
+   - KEYSTORE_BASE64
+   - KEYSTORE_PASSWORD
+   - KEY_ALIAS
+   - KEY_PASSWORD
+
+2. **Verify the Base64 encoding** is correct:
+```bash
+# Encode
+base64 release.keystore | tr -d '\n' > keystore.base64
+
+# Decode and verify (should be identical to original)
+cat keystore.base64 | base64 -d > test.keystore
+keytool -list -v -keystore test.keystore
+```
+
+3. **Check the alias matches** what's in the keystore:
+```bash
+keytool -list -v -keystore release.keystore
+# Look for "Alias name:" in the output
+```
 
 View the workflow logs for detailed error messages.
 
