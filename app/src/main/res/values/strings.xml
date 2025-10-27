@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Lister</string>
+
+    <!-- List Management -->
+    <string name="list_overview_title">Meine Listen</string>
+    <string name="new_list_dialog_title">Neue Liste</string>
+    <string name="edit_list_dialog_title">Liste bearbeiten</string>
+    <string name="delete_list_dialog_title">Löschen</string>
+    <string name="delete_list_dialog_message">Möchtest Du wirklich die Liste „%1$s" löschen?</string>
+    <string name="list_action_dialog_message">Was möchtest Du tun?</string>
+    <string name="list_name_label">Name:</string>
+    <string name="items_badge">%1$d</string>
+    <string name="no_lists_message">Keine Listen vorhanden</string>
+
+    <!-- Item Management -->
+    <string name="new_item_dialog_title">Neuer Eintrag</string>
+    <string name="edit_item_dialog_title">Eintrag editieren</string>
+    <string name="item_name_label">Name:</string>
+    <string name="item_amount_label">Menge:</string>
+    <string name="item_unit_placeholder">g</string>
+    <string name="item_category_label">Kategorie:</string>
+
+    <!-- Categories -->
+    <string name="category_no_category">OHNE KATEGORIE</string>
+    <string name="category_in_cart">IM EINKAUFSWAGEN</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_api_section_title">API Einstellungen</string>
+    <string name="settings_app_section_title">App Einstellungen</string>
+    <string name="settings_base_url_label">Base URL:</string>
+    <string name="settings_base_url_placeholder">http://192.168.42.12/api</string>
+    <string name="settings_bearer_token_label">Bearer Token (optional):</string>
+    <string name="settings_bearer_token_placeholder">your-token-here</string>
+    <string name="settings_suggestion_count_label">Anzahl Vorschläge:</string>
+    <string name="settings_suggestion_count_placeholder">3</string>
+    <string name="settings_suggestion_count_hint">Anzahl der Vorschläge beim Hinzufügen von Items (1–20)</string>
+    <string name="settings_base_url_hint">Hinweis: Die Base URL sollte mit /api enden.</string>
+    <string name="settings_base_url_example">Beispiel: http://192.168.42.12/api</string>
+    <string name="settings_bearer_token_hint">Bearer Token wird als Authorization Header gesendet.</string>
+
+    <!-- Buttons -->
+    <string name="button_create">ERSTELLEN</string>
+    <string name="button_save">SPEICHERN</string>
+    <string name="button_close">SCHLIESSEN</string>
+    <string name="button_yes">JA</string>
+    <string name="button_edit">BEARBEITEN</string>
+    <string name="button_delete">LÖSCHEN</string>
+    <string name="button_cancel">ABBRECHEN</string>
+    <string name="button_create_list">LISTE ERSTELLEN</string>
+    <string name="button_retry">Erneut versuchen</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_back">Zurück</string>
+    <string name="cd_settings">Einstellungen</string>
+    <string name="cd_new_list">Neue Liste</string>
+    <string name="cd_new_item">Neues Item</string>
+    <string name="cd_delete_all_in_cart">Alle im Warenkorb löschen</string>
+    <string name="cd_expand">Ausklappen</string>
+    <string name="cd_collapse">Einklappen</string>
+
+    <!-- Error Messages -->
+    <string name="error_prefix">Fehler: %1$s</string>
+    <string name="error_unknown">Unbekannter Fehler</string>
+</resources>
