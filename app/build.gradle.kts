@@ -12,8 +12,8 @@ android {
         applicationId = "xyz.travitia.lister"
         minSdk = 26
         targetSdk = 34
-        versionCode = 2
-        versionName = "0.0.3"
+        versionCode = 3
+        versionName = "0.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -70,6 +70,17 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+
+    applicationVariants.all {
+        outputs.all {
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl).outputFileName =
+                if (name.contains("release")) {
+                    "lister.apk"
+                } else {
+                    "lister-debug.apk"
+                }
         }
     }
 }
