@@ -191,7 +191,17 @@ fun EditItemDialog(
     onSave: (UpdateItemRequest) -> Unit
 ) {
     var itemName by remember { mutableStateOf(item.name) }
-    var amount by remember { mutableStateOf(item.amount?.toString() ?: "") }
+    var amount by remember {
+        mutableStateOf(
+            item.amount?.let { amt ->
+                if (amt % 1.0 == 0.0) {
+                    amt.toInt().toString()
+                } else {
+                    amt.toString()
+                }
+            } ?: ""
+        )
+    }
     var unit by remember { mutableStateOf(item.amountUnit ?: "") }
     var category by remember { mutableStateOf(item.category ?: "") }
     var showCategorySuggestions by remember { mutableStateOf(false) }
@@ -284,11 +294,12 @@ fun EditItemDialog(
             TextButton(
                 onClick = {
                     if (itemName.isNotBlank()) {
+                        val parsedAmount = if (amount.isBlank()) null else amount.toDoubleOrNull()
                         onSave(
                             UpdateItemRequest(
                                 name = itemName,
-                                amount = if (amount.isBlank()) null else amount.toDoubleOrNull(),
-                                amountUnit = if (unit.isBlank()) null else unit,
+                                amount = parsedAmount,
+                                amountUnit = if (parsedAmount == null) null else (if (unit.isBlank()) null else unit),
                                 category = if (category.isBlank()) null else category
                             )
                         )
