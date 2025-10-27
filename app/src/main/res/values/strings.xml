@@ -35,7 +35,7 @@
     <string name="settings_bearer_token_placeholder">your-token-here</string>
     <string name="settings_suggestion_count_label">Anzahl Vorschläge:</string>
     <string name="settings_suggestion_count_placeholder">3</string>
-    <string name="settings_suggestion_count_hint">Anzahl der Vorschläge beim Hinzufügen von Items (1–20)</string>
+    <string name="settings_suggestion_count_hint">Anzahl der Vorschläge beim Hinzufügen von Items (0 = unbegrenzt, 1–100)</string>
     <string name="settings_base_url_hint">Hinweis: Die Base URL sollte mit /api enden.</string>
     <string name="settings_base_url_example">Beispiel: http://192.168.42.12/api</string>
     <string name="settings_bearer_token_hint">Bearer Token wird als Authorization Header gesendet.</string>

@@ -33,18 +33,20 @@ fun CreateItemDialog(
 
     val filteredItemSuggestions = remember(itemName, suggestions, suggestionCount) {
         if (itemName.isNotBlank()) {
-            suggestions.filter { it.contains(itemName, ignoreCase = true) }.take(suggestionCount)
+            val filtered = suggestions.filter { it.contains(itemName, ignoreCase = true) }
+            if (suggestionCount == 0) filtered else filtered.take(suggestionCount)
         } else {
             emptyList()
         }
     }
 
     val filteredCategorySuggestions = remember(category, categorySuggestions, suggestionCount) {
-        if (category.isNotBlank()) {
-            categorySuggestions.filter { it.contains(category, ignoreCase = true) }.take(suggestionCount)
+        val filtered = if (category.isNotBlank()) {
+            categorySuggestions.filter { it.contains(category, ignoreCase = true) }
         } else {
-            categorySuggestions.take(suggestionCount)
+            categorySuggestions
         }
+        if (suggestionCount == 0) filtered else filtered.take(suggestionCount)
     }
 
     LaunchedEffect(itemName) {
@@ -195,11 +197,12 @@ fun EditItemDialog(
     var showCategorySuggestions by remember { mutableStateOf(false) }
 
     val filteredCategorySuggestions = remember(category, categorySuggestions, suggestionCount) {
-        if (category.isNotBlank()) {
-            categorySuggestions.filter { it.contains(category, ignoreCase = true) }.take(suggestionCount)
+        val filtered = if (category.isNotBlank()) {
+            categorySuggestions.filter { it.contains(category, ignoreCase = true) }
         } else {
-            categorySuggestions.take(suggestionCount)
+            categorySuggestions
         }
+        if (suggestionCount == 0) filtered else filtered.take(suggestionCount)
     }
 
     AlertDialog(

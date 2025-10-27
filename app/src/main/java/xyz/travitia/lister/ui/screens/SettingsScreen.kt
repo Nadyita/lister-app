@@ -106,7 +106,7 @@ fun SettingsScreen(
             OutlinedTextField(
                 value = suggestionCount,
                 onValueChange = { newValue ->
-                    if (newValue.isEmpty() || newValue.toIntOrNull() != null) {
+                    if (newValue.isEmpty() || newValue.toIntOrNull()?.let { it >= 0 && it <= 100 } == true) {
                         suggestionCount = newValue
                     }
                 },

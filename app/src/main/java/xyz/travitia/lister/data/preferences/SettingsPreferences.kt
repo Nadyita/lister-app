@@ -52,7 +52,7 @@ class SettingsPreferences(private val context: Context) {
 
     suspend fun setSuggestionCount(count: Int) {
         context.dataStore.edit { preferences ->
-            preferences[SUGGESTION_COUNT_KEY] = count.coerceIn(1, 20)
+            preferences[SUGGESTION_COUNT_KEY] = count.coerceIn(0, 100)
         }
     }
 }

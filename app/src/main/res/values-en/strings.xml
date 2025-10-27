@@ -35,7 +35,7 @@
     <string name="settings_bearer_token_placeholder">your-token-here</string>
     <string name="settings_suggestion_count_label">Number of Suggestions:</string>
     <string name="settings_suggestion_count_placeholder">3</string>
-    <string name="settings_suggestion_count_hint">Number of suggestions when adding items (1–20)</string>
+    <string name="settings_suggestion_count_hint">Number of suggestions when adding items (0 = unlimited, 1–100)</string>
     <string name="settings_base_url_hint">Note: The base URL should end with /api.</string>
     <string name="settings_base_url_example">Example: http://192.168.42.12/api</string>
     <string name="settings_bearer_token_hint">Bearer token will be sent as Authorization header.</string>
