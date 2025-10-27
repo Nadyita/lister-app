@@ -163,7 +163,7 @@ fun CreateItemDialog(
                         onCreate(
                             CreateItemRequest(
                                 name = itemName,
-                                amount = amount.toIntOrNull(),
+                                amount = amount.toDoubleOrNull(),
                                 amountUnit = unit.ifBlank { null },
                                 category = category.ifBlank { null }
                             )
@@ -287,7 +287,7 @@ fun EditItemDialog(
                         onSave(
                             UpdateItemRequest(
                                 name = itemName,
-                                amount = if (amount.isBlank()) null else amount.toIntOrNull(),
+                                amount = if (amount.isBlank()) null else amount.toDoubleOrNull(),
                                 amountUnit = if (unit.isBlank()) null else unit,
                                 category = if (category.isBlank()) null else category
                             )

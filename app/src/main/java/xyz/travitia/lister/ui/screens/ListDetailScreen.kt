@@ -294,7 +294,13 @@ fun ItemRow(
             ) {
                 Text(
                     text = buildString {
-                        append(item.amount)
+                        // Format amount: remove ".0" for whole numbers
+                        val formattedAmount = if (item.amount % 1.0 == 0.0) {
+                            item.amount.toInt().toString()
+                        } else {
+                            item.amount.toString()
+                        }
+                        append(formattedAmount)
                         if (item.amountUnit != null) {
                             append(" ${item.amountUnit}")
                         }
