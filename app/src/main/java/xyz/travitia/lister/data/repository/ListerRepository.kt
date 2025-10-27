@@ -98,6 +98,11 @@ class ListerRepository(private val settingsPreferences: SettingsPreferences) {
         return safeApiCall { getApiService().getCategories() }
     }
 
+    suspend fun updateCategory(id: Int, name: String): Result<Category> {
+        Log.d(TAG, "==> updateCategory(id=$id, name=$name)")
+        return safeApiCall { getApiService().updateCategory(id, UpdateCategoryRequest(name)) }
+    }
+
     suspend fun searchItems(): Result<List<String>> {
         Log.d(TAG, "==> searchItems()")
         return safeApiCall { getApiService().searchItems() }

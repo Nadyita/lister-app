@@ -48,6 +48,7 @@ fun ListDetailScreen(
 
     var showCreateDialog by remember { mutableStateOf(false) }
     var editingItem by remember { mutableStateOf<Item?>(null) }
+    var renamingCategory by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(listId) {
         viewModel.initialize(listId, listName)
@@ -142,6 +143,9 @@ fun ListDetailScreen(
                             },
                             onItemLongClick = { item ->
                                 editingItem = item
+                            },
+                            onCategoryLongClick = { categoryName ->
+                                renamingCategory = categoryName
                             }
                         )
                     }
@@ -178,13 +182,26 @@ fun ListDetailScreen(
             }
         )
     }
+
+    renamingCategory?.let { categoryName ->
+        RenameCategoryDialog(
+            currentName = categoryName,
+            onDismiss = { renamingCategory = null },
+            onSave = { newName ->
+                viewModel.renameCategory(categoryName, newName) {
+                    renamingCategory = null
+                }
+            }
+        )
+    }
 }
 
 @Composable
 fun ItemsList(
     items: List<Item>,
     onItemClick: (Item) -> Unit,
-    onItemLongClick: (Item) -> Unit
+    onItemLongClick: (Item) -> Unit,
+    onCategoryLongClick: (String) -> Unit
 ) {
     val itemsNotInCart = items.filter { !it.inCart }
     val itemsInCart = items.filter { it.inCart }
@@ -215,7 +232,12 @@ fun ItemsList(
                     category = category,
                     color = color,
                     isExpanded = isExpanded,
-                    onToggle = { expandedCategories[category] = !isExpanded }
+                    onToggle = { expandedCategories[category] = !isExpanded },
+                    onLongClick = if (!isInCart) {
+                        { onCategoryLongClick(category) }
+                    } else {
+                        null
+                    }
                 )
             }
 
@@ -235,8 +257,15 @@ fun ItemsList(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CategoryHeader(category: String, color: Color, isExpanded: Boolean, onToggle: () -> Unit) {
+fun CategoryHeader(
+    category: String,
+    color: Color,
+    isExpanded: Boolean,
+    onToggle: () -> Unit,
+    onLongClick: (() -> Unit)? = null
+) {
     val cdExpand = stringResource(R.string.cd_expand)
     val cdCollapse = stringResource(R.string.cd_collapse)
 
@@ -244,7 +273,10 @@ fun CategoryHeader(category: String, color: Color, isExpanded: Boolean, onToggle
         modifier = Modifier
             .fillMaxWidth()
             .background(color.copy(alpha = 0.3f))
-            .clickable(onClick = onToggle)
+            .combinedClickable(
+                onClick = onToggle,
+                onLongClick = onLongClick
+            )
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -311,5 +343,47 @@ fun ItemRow(
             }
         }
     }
+}
+
+@Composable
+fun RenameCategoryDialog(
+    currentName: String,
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    var categoryName by remember { mutableStateOf(currentName) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.rename_category_dialog_title)) },
+        text = {
+            Column {
+                Text(stringResource(R.string.category_name_label))
+                Spacer(modifier = Modifier.height(4.dp))
+                OutlinedTextField(
+                    value = categoryName,
+                    onValueChange = { categoryName = it },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (categoryName.isNotBlank() && categoryName != currentName) {
+                        onSave(categoryName)
+                    }
+                }
+            ) {
+                Text(stringResource(R.string.button_save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.button_cancel))
+            }
+        }
+    )
 }
 

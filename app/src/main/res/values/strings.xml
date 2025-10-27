@@ -24,6 +24,8 @@
     <!-- Categories -->
     <string name="category_no_category">OHNE KATEGORIE</string>
     <string name="category_in_cart">IM EINKAUFSWAGEN</string>
+    <string name="rename_category_dialog_title">Kategorie umbenennen</string>
+    <string name="category_name_label">Name:</string>
 
     <!-- Settings -->
     <string name="settings_title">Einstellungen</string>

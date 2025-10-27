@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import xyz.travitia.lister.data.model.Category
 import xyz.travitia.lister.data.model.CreateItemRequest
 import xyz.travitia.lister.data.model.Item
 import xyz.travitia.lister.data.model.UpdateItemRequest
@@ -18,6 +19,7 @@ data class ListDetailUiState(
     val listName: String = "",
     val items: List<Item> = emptyList(),
     val itemSuggestions: List<String> = emptyList(),
+    val categories: List<Category> = emptyList(),
     val categorySuggestions: List<String> = emptyList(),
     val categoryMappings: Map<String, String?> = emptyMap(),
     val suggestionCount: Int = SettingsPreferences.DEFAULT_SUGGESTION_COUNT,
@@ -99,7 +101,10 @@ class ListDetailViewModel(
                     Log.d(TAG, "loadCategories() success: ${categories.size} categories")
                     val categoryNames = categories.map { it.name }
                     val sortedCategories = sortCategoriesByFrequency(categoryNames)
-                    _uiState.value = _uiState.value.copy(categorySuggestions = sortedCategories)
+                    _uiState.value = _uiState.value.copy(
+                        categories = categories,
+                        categorySuggestions = sortedCategories
+                    )
                 },
                 onFailure = { error ->
                     Log.e(TAG, "loadCategories() error: ${error.message}")
@@ -233,6 +238,33 @@ class ListDetailViewModel(
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun renameCategory(categoryName: String, newName: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            Log.d(TAG, "renameCategory(categoryName=$categoryName, newName=$newName)")
+            // Find category by name
+            val category = _uiState.value.categories.find { it.name == categoryName }
+            if (category == null) {
+                Log.e(TAG, "Category '$categoryName' not found")
+                _uiState.value = _uiState.value.copy(error = "Category not found")
+                return@launch
+            }
+
+            repository.updateCategory(category.id, newName).fold(
+                onSuccess = {
+                    Log.d(TAG, "renameCategory() success")
+                    loadItems()
+                    loadCategories()
+                    loadCategoryMappings()
+                    onSuccess()
+                },
+                onFailure = { error ->
+                    Log.e(TAG, "renameCategory() error: ${error.message}")
+                    _uiState.value = _uiState.value.copy(error = error.message)
+                }
+            )
+        }
     }
 }
 
