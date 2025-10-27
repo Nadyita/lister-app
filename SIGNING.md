@@ -10,10 +10,10 @@ The app is configured to automatically sign release APKs when the required signi
 
 ### 1. Generate a Keystore
 
-If you don't have a keystore yet, create one:
+If you don't have a keystore yet, create one in the project root:
 
 ```bash
-keytool -genkey -v -keystore app/release.keystore -alias lister -keyalg RSA -keysize 2048 -validity 10000
+keytool -genkey -v -keystore release.keystore -alias lister -keyalg RSA -keysize 2048 -validity 10000
 ```
 
 You will be prompted to enter:
@@ -28,7 +28,7 @@ You will be prompted to enter:
 Before building a release APK locally, set these environment variables:
 
 ```bash
-export KEYSTORE_FILE="app/release.keystore"
+export KEYSTORE_FILE="release.keystore"
 export KEYSTORE_PASSWORD="your_keystore_password"
 export KEY_ALIAS="lister"
 export KEY_PASSWORD="your_key_password"
@@ -38,7 +38,7 @@ Or create a shell script (e.g., `signing.sh`) that you can source:
 
 ```bash
 #!/bin/bash
-export KEYSTORE_FILE="app/release.keystore"
+export KEYSTORE_FILE="release.keystore"
 export KEYSTORE_PASSWORD="your_keystore_password"
 export KEY_ALIAS="lister"
 export KEY_PASSWORD="your_key_password"
@@ -67,7 +67,7 @@ To enable signed releases via GitHub Actions, you need to configure GitHub Secre
 ### 1. Encode Your Keystore to Base64
 
 ```bash
-base64 app/release.keystore | tr -d '\n' > keystore.base64
+base64 release.keystore | tr -d '\n' > keystore.base64
 ```
 
 Copy the contents of `keystore.base64`.
