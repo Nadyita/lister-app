@@ -284,9 +284,9 @@ fun EditItemDialog(
                         onSave(
                             UpdateItemRequest(
                                 name = itemName,
-                                amount = amount.toIntOrNull(),
-                                amountUnit = unit.ifBlank { null },
-                                category = category.ifBlank { null }
+                                amount = if (amount.isBlank()) null else amount.toIntOrNull(),
+                                amountUnit = if (unit.isBlank()) null else unit,
+                                category = if (category.isBlank()) null else category
                             )
                         )
                     }

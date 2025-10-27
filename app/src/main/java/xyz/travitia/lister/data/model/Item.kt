@@ -18,9 +18,9 @@ data class CreateItemRequest(
 )
 
 data class UpdateItemRequest(
-    val name: String? = null,
-    val amount: Int? = null,
-    val amountUnit: String? = null,
-    val category: String? = null
+    val name: String,
+    val amount: Int?,
+    val amountUnit: String?,
+    val category: String?
 )
 
