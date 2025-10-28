@@ -40,9 +40,19 @@
     <string name="settings_suggestion_count_placeholder">3</string>
     <string name="settings_suggestion_count_hint">Anzahl der Vorschläge beim Hinzufügen von Items (0 = unbegrenzt, 1–100)</string>
     <string name="settings_primary_color_label">Primärfarbe:</string>
+    <string name="settings_manage_categories">Kategorien verwalten</string>
     <string name="settings_base_url_hint">Hinweis: Die Base URL sollte mit /api enden.</string>
     <string name="settings_base_url_example">Beispiel: http://192.168.42.12/api</string>
     <string name="settings_bearer_token_hint">Bearer Token wird als Authorization Header gesendet.</string>
+
+    <!-- Category Management -->
+    <string name="category_management_title">Kategorien verwalten</string>
+    <string name="category_action_dialog_message">Was möchtest Du tun?</string>
+    <string name="delete_category_dialog_title">Löschen</string>
+    <string name="delete_category_dialog_message">Möchtest Du wirklich die Kategorie „%1$s" löschen?</string>
+    <string name="delete_category_error_has_items">Diese Kategorie kann nicht gelöscht werden, da sie noch %1$d Einträge enthält.</string>
+    <string name="no_categories_message">Keine Kategorien vorhanden</string>
+    <string name="button_rename">UMBENENNEN</string>
 
     <!-- Color Names -->
     <string name="color_purple">Lila</string>

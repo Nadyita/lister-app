@@ -13,10 +13,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import xyz.travitia.lister.ui.navigation.Screen
+import xyz.travitia.lister.ui.screens.CategoryManagementScreen
 import xyz.travitia.lister.ui.screens.ListDetailScreen
 import xyz.travitia.lister.ui.screens.ListOverviewScreen
 import xyz.travitia.lister.ui.screens.SettingsScreen
 import xyz.travitia.lister.ui.theme.ListerTheme
+import xyz.travitia.lister.ui.viewmodel.CategoryManagementViewModel
 import xyz.travitia.lister.ui.viewmodel.ListDetailViewModel
 import xyz.travitia.lister.ui.viewmodel.ListOverviewViewModel
 import xyz.travitia.lister.ui.viewmodel.SettingsViewModel
@@ -84,6 +86,19 @@ fun ListerApp() {
                 factory = SettingsViewModelFactory(application.settingsPreferences)
             )
             SettingsScreen(
+                viewModel = viewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToCategories = {
+                    navController.navigate(Screen.CategoryManagement.route)
+                }
+            )
+        }
+
+        composable(Screen.CategoryManagement.route) {
+            val viewModel: CategoryManagementViewModel = viewModel(
+                factory = CategoryManagementViewModelFactory(application.repository)
+            )
+            CategoryManagementScreen(
                 viewModel = viewModel,
                 onNavigateBack = { navController.popBackStack() }
             )

@@ -24,7 +24,8 @@ import xyz.travitia.lister.ui.viewmodel.SettingsViewModel
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToCategories: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var baseUrl by remember { mutableStateOf(uiState.baseUrl) }
@@ -125,6 +126,15 @@ fun SettingsScreen(
                 placeholder = { Text(stringResource(R.string.settings_suggestion_count_placeholder)) },
                 supportingText = { Text(stringResource(R.string.settings_suggestion_count_hint)) }
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedButton(
+                onClick = onNavigateToCategories,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.settings_manage_categories))
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 

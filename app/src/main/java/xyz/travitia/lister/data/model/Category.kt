@@ -5,6 +5,12 @@ data class Category(
     val name: String
 )
 
+data class CategoryWithCount(
+    val id: Int,
+    val name: String,
+    val itemCount: Int
+)
+
 data class CreateCategoryRequest(
     val name: String
 )

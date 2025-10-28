@@ -6,5 +6,6 @@ sealed class Screen(val route: String) {
         fun createRoute(listId: Int, listName: String) = "list_detail/$listId/$listName"
     }
     object Settings : Screen("settings")
+    object CategoryManagement : Screen("category_management")
 }
 
