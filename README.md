@@ -61,7 +61,7 @@ app/src/main/java/xyz/travitia/lister/
 
 ## API Integration
 
-The app connects to a RESTful backend API. Configure the API Base URL in the app settings.
+The app connects to a [RESTful backend API](https://github.com/Nadyita/lister-api). Configure the API Base URL in the app settings.
 
 ## Build & Installation
 
@@ -89,7 +89,7 @@ The app connects to a RESTful backend API. Configure the API Base URL in the app
 
 ## Download
 
-Pre-built APK files are available in the [Releases](https://github.com/YOUR_USERNAME/lister-app/releases) section.
+Pre-built APK files are available in the [Releases](https://github.com/Nadyita/lister-app/releases) section.
 
 ## Configuration
 
@@ -112,8 +112,8 @@ The Bearer Token will be sent as an `Authorization: Bearer <token>` header with 
 ### Interactions
 - **Normal Click**: Open list / Check off item
 - **Long Press**: Edit/Delete menu
-- **FAB (+)**: Create new element
-- **FAB (checkmark)**: Delete all items in cart
+- **Floating Action Button (+)**: Create new element
+- **Floating Action Button (checkmark)**: Delete all items in cart
 
 ## Known Limitations
 
