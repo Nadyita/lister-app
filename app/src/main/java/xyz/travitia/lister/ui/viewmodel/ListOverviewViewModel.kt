@@ -14,7 +14,8 @@ data class ListOverviewUiState(
     val lists: List<ShoppingListWithCount> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val isReorderMode: Boolean = false
+    val isReorderMode: Boolean = false,
+    val hiddenLists: Set<Int> = emptySet()
 )
 
 class ListOverviewViewModel(
@@ -26,9 +27,11 @@ class ListOverviewViewModel(
     val uiState: StateFlow<ListOverviewUiState> = _uiState.asStateFlow()
 
     private var listOrder: Map<Int, Int> = emptyMap()
+    private var hiddenLists: Set<Int> = emptySet()
 
     init {
         loadOrder()
+        loadHiddenLists()
         loadLists()
     }
 
@@ -43,6 +46,15 @@ class ListOverviewViewModel(
                         lists = sortListsByOrder(currentLists)
                     )
                 }
+            }
+        }
+    }
+
+    private fun loadHiddenLists() {
+        viewModelScope.launch {
+            settingsPreferences.hiddenLists.collect { hidden ->
+                hiddenLists = hidden
+                _uiState.value = _uiState.value.copy(hiddenLists = hidden)
             }
         }
     }
@@ -133,6 +145,17 @@ class ListOverviewViewModel(
             }.toMap()
             settingsPreferences.setListOrder(orderMap)
             _uiState.value = _uiState.value.copy(lists = newOrder)
+        }
+    }
+
+    fun toggleListVisibility(listId: Int) {
+        viewModelScope.launch {
+            val newHiddenLists = if (hiddenLists.contains(listId)) {
+                hiddenLists - listId
+            } else {
+                hiddenLists + listId
+            }
+            settingsPreferences.setHiddenLists(newHiddenLists)
         }
     }
 }

@@ -21,6 +21,7 @@ class SettingsPreferences(private val context: Context) {
         private val SUGGESTION_COUNT_KEY = intPreferencesKey("suggestion_count")
         private val PRIMARY_COLOR_KEY = stringPreferencesKey("primary_color")
         private val LIST_ORDER_KEY = stringPreferencesKey("list_order")
+        private val HIDDEN_LISTS_KEY = stringPreferencesKey("hidden_lists")
         const val DEFAULT_BASE_URL = ""
         const val DEFAULT_SUGGESTION_COUNT = 3
     }
@@ -61,6 +62,15 @@ class SettingsPreferences(private val context: Context) {
         }
     }
 
+    val hiddenLists: Flow<Set<Int>> = context.dataStore.data.map { preferences ->
+        val hiddenString = preferences[HIDDEN_LISTS_KEY] ?: ""
+        if (hiddenString.isBlank()) {
+            emptySet()
+        } else {
+            hiddenString.split(",").mapNotNull { it.toIntOrNull() }.toSet()
+        }
+    }
+
     suspend fun setBaseUrl(url: String) {
         context.dataStore.edit { preferences ->
             val normalizedUrl = if (url.isNotBlank() && !url.endsWith("/")) "$url/" else url
@@ -94,6 +104,13 @@ class SettingsPreferences(private val context: Context) {
         context.dataStore.edit { preferences ->
             val orderString = order.entries.joinToString(",") { "${it.key}:${it.value}" }
             preferences[LIST_ORDER_KEY] = orderString
+        }
+    }
+
+    suspend fun setHiddenLists(hiddenListIds: Set<Int>) {
+        context.dataStore.edit { preferences ->
+            val hiddenString = hiddenListIds.joinToString(",")
+            preferences[HIDDEN_LISTS_KEY] = hiddenString
         }
     }
 }

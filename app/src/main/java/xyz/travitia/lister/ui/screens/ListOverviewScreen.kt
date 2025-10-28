@@ -198,7 +198,12 @@ fun ListOverviewScreen(
                         )
                     }
                     else -> {
-                        val displayLists = if (uiState.isReorderMode) localLists else uiState.lists
+                        val allLists = if (uiState.isReorderMode) localLists else uiState.lists
+                        val displayLists = if (uiState.isReorderMode) {
+                            allLists
+                        } else {
+                            allLists.filter { !uiState.hiddenLists.contains(it.id) }
+                        }
                         
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
@@ -223,7 +228,9 @@ fun ListOverviewScreen(
                                         },
                                         isReorderMode = uiState.isReorderMode,
                                         isDragging = isDragging,
-                                        dragModifier = Modifier.draggableHandle()
+                                        dragModifier = Modifier.draggableHandle(),
+                                        isVisible = !uiState.hiddenLists.contains(list.id),
+                                        onVisibilityToggle = { viewModel.toggleListVisibility(list.id) }
                                     )
                                     HorizontalDivider()
                                 }
@@ -294,7 +301,9 @@ fun ListItem(
     onLongClick: () -> Unit,
     isReorderMode: Boolean,
     isDragging: Boolean,
-    dragModifier: Modifier
+    dragModifier: Modifier,
+    isVisible: Boolean,
+    onVisibilityToggle: () -> Unit
 ) {
     val elevation = if (isDragging) 8.dp else 0.dp
     
@@ -332,15 +341,22 @@ fun ListItem(
                 )
             }
 
-            list.count?.let { count ->
-                Badge(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ) {
-                    Text(
-                        text = count.toString(),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    )
+            if (isReorderMode) {
+                Switch(
+                    checked = isVisible,
+                    onCheckedChange = { onVisibilityToggle() }
+                )
+            } else {
+                list.count?.let { count ->
+                    Badge(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Text(
+                            text = count.toString(),
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                    }
                 }
             }
         }
