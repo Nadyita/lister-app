@@ -23,7 +23,6 @@ import xyz.travitia.lister.ui.components.CreateListDialog
 import xyz.travitia.lister.ui.components.DeleteListDialog
 import xyz.travitia.lister.ui.components.EditListDialog
 import xyz.travitia.lister.ui.components.ListActionDialog
-import xyz.travitia.lister.ui.theme.ListerPurple
 import xyz.travitia.lister.ui.viewmodel.ListOverviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -76,7 +75,7 @@ fun ListOverviewScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showCreateDialog = true },
-                containerColor = ListerPurple
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
                     Icons.Default.Add,
@@ -233,7 +232,7 @@ fun ListItem(
 
         list.count?.let { count ->
             Badge(
-                containerColor = ListerPurple
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(
                     text = count.toString(),

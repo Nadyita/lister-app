@@ -31,7 +31,6 @@ import xyz.travitia.lister.ui.components.CreateItemDialog
 import xyz.travitia.lister.ui.components.EditItemDialog
 import xyz.travitia.lister.ui.theme.ListerGray
 import xyz.travitia.lister.ui.theme.ListerGreen
-import xyz.travitia.lister.ui.theme.ListerPurple
 import xyz.travitia.lister.ui.viewmodel.ListDetailViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -105,7 +104,7 @@ fun ListDetailScreen(
                 }
                 FloatingActionButton(
                     onClick = { showCreateDialog = true },
-                    containerColor = ListerPurple
+                    containerColor = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(
                         Icons.Default.Add,
@@ -218,13 +217,14 @@ fun ItemsList(
 
     val allGroups = groupedNotInCart.entries.toList() + groupedInCart.entries.toList()
     val expandedCategories = remember { mutableStateMapOf<String, Boolean>() }
+    val primaryColor = MaterialTheme.colorScheme.primary
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         allGroups.forEachIndexed { _, (category, categoryItems) ->
             val isInCart = category == inCartString
-            val color = if (isInCart) ListerGray else ListerPurple
+            val color = if (isInCart) ListerGray else primaryColor
             val isExpanded = expandedCategories[category] ?: true
 
             item(key = "header_$category") {
@@ -322,7 +322,7 @@ fun ItemRow(
 
         if (item.amount != null) {
             Badge(
-                containerColor = ListerPurple
+                containerColor = MaterialTheme.colorScheme.primary
             ) {
                 Text(
                     text = buildString {

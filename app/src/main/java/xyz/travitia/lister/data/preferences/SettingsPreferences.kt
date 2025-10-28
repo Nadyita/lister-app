@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import xyz.travitia.lister.data.model.PrimaryColor
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
@@ -18,6 +19,7 @@ class SettingsPreferences(private val context: Context) {
         private val BASE_URL_KEY = stringPreferencesKey("base_url")
         private val BEARER_TOKEN_KEY = stringPreferencesKey("bearer_token")
         private val SUGGESTION_COUNT_KEY = intPreferencesKey("suggestion_count")
+        private val PRIMARY_COLOR_KEY = stringPreferencesKey("primary_color")
         const val DEFAULT_BASE_URL = "http://192.168.42.12/api"
         const val DEFAULT_SUGGESTION_COUNT = 3
     }
@@ -32,6 +34,10 @@ class SettingsPreferences(private val context: Context) {
 
     val suggestionCount: Flow<Int> = context.dataStore.data.map { preferences ->
         preferences[SUGGESTION_COUNT_KEY] ?: DEFAULT_SUGGESTION_COUNT
+    }
+
+    val primaryColor: Flow<PrimaryColor> = context.dataStore.data.map { preferences ->
+        PrimaryColor.fromName(preferences[PRIMARY_COLOR_KEY])
     }
 
     suspend fun setBaseUrl(url: String) {
@@ -53,6 +59,12 @@ class SettingsPreferences(private val context: Context) {
     suspend fun setSuggestionCount(count: Int) {
         context.dataStore.edit { preferences ->
             preferences[SUGGESTION_COUNT_KEY] = count.coerceIn(0, 100)
+        }
+    }
+
+    suspend fun setPrimaryColor(color: PrimaryColor) {
+        context.dataStore.edit { preferences ->
+            preferences[PRIMARY_COLOR_KEY] = color.name
         }
     }
 }

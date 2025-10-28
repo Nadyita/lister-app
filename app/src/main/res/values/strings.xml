@@ -31,6 +31,7 @@
     <string name="settings_title">Einstellungen</string>
     <string name="settings_api_section_title">API Einstellungen</string>
     <string name="settings_app_section_title">App Einstellungen</string>
+    <string name="settings_appearance_section_title">Darstellung</string>
     <string name="settings_base_url_label">Base URL:</string>
     <string name="settings_base_url_placeholder">http://192.168.42.12/api</string>
     <string name="settings_bearer_token_label">Bearer Token (optional):</string>
@@ -38,9 +39,20 @@
     <string name="settings_suggestion_count_label">Anzahl Vorschläge:</string>
     <string name="settings_suggestion_count_placeholder">3</string>
     <string name="settings_suggestion_count_hint">Anzahl der Vorschläge beim Hinzufügen von Items (0 = unbegrenzt, 1–100)</string>
+    <string name="settings_primary_color_label">Primärfarbe:</string>
     <string name="settings_base_url_hint">Hinweis: Die Base URL sollte mit /api enden.</string>
     <string name="settings_base_url_example">Beispiel: http://192.168.42.12/api</string>
     <string name="settings_bearer_token_hint">Bearer Token wird als Authorization Header gesendet.</string>
+
+    <!-- Color Names -->
+    <string name="color_purple">Lila</string>
+    <string name="color_blue">Blau</string>
+    <string name="color_green">Grün</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_red">Rot</string>
+    <string name="color_teal">Türkis</string>
+    <string name="color_indigo">Indigo</string>
+    <string name="color_brown">Braun</string>
 
     <!-- Buttons -->
     <string name="button_create">ERSTELLEN</string>

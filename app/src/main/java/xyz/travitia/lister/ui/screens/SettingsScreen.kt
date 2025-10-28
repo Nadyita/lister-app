@@ -1,15 +1,23 @@
 package xyz.travitia.lister.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import xyz.travitia.lister.R
+import xyz.travitia.lister.data.model.PrimaryColor
 import xyz.travitia.lister.ui.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,11 +30,13 @@ fun SettingsScreen(
     var baseUrl by remember { mutableStateOf(uiState.baseUrl) }
     var bearerToken by remember { mutableStateOf(uiState.bearerToken) }
     var suggestionCount by remember { mutableStateOf(uiState.suggestionCount.toString()) }
+    var selectedColor by remember { mutableStateOf(uiState.primaryColor) }
 
-    LaunchedEffect(uiState.baseUrl, uiState.bearerToken, uiState.suggestionCount) {
+    LaunchedEffect(uiState.baseUrl, uiState.bearerToken, uiState.suggestionCount, uiState.primaryColor) {
         baseUrl = uiState.baseUrl
         bearerToken = uiState.bearerToken
         suggestionCount = uiState.suggestionCount.toString()
+        selectedColor = uiState.primaryColor
     }
 
     Scaffold(
@@ -116,12 +126,33 @@ fun SettingsScreen(
                 supportingText = { Text(stringResource(R.string.settings_suggestion_count_hint)) }
             )
 
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = stringResource(R.string.settings_appearance_section_title),
+                style = MaterialTheme.typography.titleLarge
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(R.string.settings_primary_color_label),
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ColorSelectionGrid(
+                selectedColor = selectedColor,
+                onColorSelected = { selectedColor = it }
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
                     val count = suggestionCount.toIntOrNull() ?: 3
-                    viewModel.saveSettings(baseUrl, bearerToken, count) {
+                    viewModel.saveSettings(baseUrl, bearerToken, count, selectedColor) {
                         onNavigateBack()
                     }
                 },
@@ -162,5 +193,74 @@ fun SettingsScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
+    }
+}
+
+@Composable
+fun ColorSelectionGrid(
+    selectedColor: PrimaryColor,
+    onColorSelected: (PrimaryColor) -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        val colors = PrimaryColor.entries
+        val chunkedColors = colors.chunked(4)
+
+        chunkedColors.forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                row.forEach { color ->
+                    ColorOption(
+                        color = color,
+                        isSelected = color == selectedColor,
+                        onSelect = { onColorSelected(color) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                repeat(4 - row.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ColorOption(
+    color: PrimaryColor,
+    isSelected: Boolean,
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clickable(onClick = onSelect)
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(color.toColor())
+                .then(
+                    if (isSelected) {
+                        Modifier.border(3.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
+                    } else {
+                        Modifier.border(1.dp, Color.Gray.copy(alpha = 0.3f), CircleShape)
+                    }
+                )
+        )
+
+        Text(
+            text = stringResource(color.nameResId),
+            style = MaterialTheme.typography.bodySmall,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
