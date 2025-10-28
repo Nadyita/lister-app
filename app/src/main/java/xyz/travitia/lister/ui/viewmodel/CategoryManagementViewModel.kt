@@ -12,7 +12,9 @@ import xyz.travitia.lister.data.repository.ListerRepository
 data class CategoryManagementUiState(
     val categories: List<CategoryWithCount> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isMultiSelectMode: Boolean = false,
+    val selectedCategories: Set<Int> = emptySet()
 )
 
 class CategoryManagementViewModel(private val repository: ListerRepository) : ViewModel() {
@@ -109,6 +111,54 @@ class CategoryManagementViewModel(private val repository: ListerRepository) : Vi
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun toggleMultiSelectMode() {
+        _uiState.value = _uiState.value.copy(
+            isMultiSelectMode = !_uiState.value.isMultiSelectMode,
+            selectedCategories = emptySet()
+        )
+    }
+
+    fun toggleCategorySelection(categoryId: Int) {
+        val currentSelection = _uiState.value.selectedCategories
+        _uiState.value = _uiState.value.copy(
+            selectedCategories = if (currentSelection.contains(categoryId)) {
+                currentSelection - categoryId
+            } else {
+                currentSelection + categoryId
+            }
+        )
+    }
+
+    fun deleteSelectedCategories(onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            val selectedIds = _uiState.value.selectedCategories.toList()
+            var hasError = false
+
+            for (categoryId in selectedIds) {
+                val result = repository.deleteCategory(categoryId)
+                if (result.isFailure) {
+                    hasError = true
+                    _uiState.value = _uiState.value.copy(
+                        error = result.exceptionOrNull()?.message ?: "Failed to delete categories"
+                    )
+                    break
+                }
+            }
+
+            if (!hasError) {
+                _uiState.value = _uiState.value.copy(
+                    isMultiSelectMode = false,
+                    selectedCategories = emptySet()
+                )
+                loadCategories()
+                onSuccess()
+            } else {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }
+        }
     }
 }
 

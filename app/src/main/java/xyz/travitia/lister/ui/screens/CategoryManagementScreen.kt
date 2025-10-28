@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -50,11 +52,59 @@ fun CategoryManagementScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.category_management_title)) },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                    if (!uiState.isMultiSelectMode) {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.cd_back)
+                            )
+                        }
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            if (uiState.isMultiSelectMode) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    FloatingActionButton(
+                        onClick = { viewModel.toggleMultiSelectMode() },
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ) {
+                        Icon(
+                            Icons.Default.Close,
+                            contentDescription = stringResource(R.string.button_cancel),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    val hasSelection = uiState.selectedCategories.isNotEmpty()
+                    FloatingActionButton(
+                        onClick = {
+                            if (hasSelection) {
+                                viewModel.deleteSelectedCategories {
+                                    // Success callback
+                                }
+                            }
+                        },
+                        containerColor = if (hasSelection) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.button_delete),
+                            tint = if (hasSelection) {
+                                MaterialTheme.colorScheme.onError
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                            }
+                        )
+                    }
+                }
+            }
         }
     ) { paddingValues ->
         Box(
@@ -108,7 +158,26 @@ fun CategoryManagementScreen(
                         items(uiState.categories) { category ->
                             CategoryItem(
                                 category = category,
-                                onLongClick = { showActionDialog = category }
+                                onClick = {
+                                    if (uiState.isMultiSelectMode) {
+                                        if (category.itemCount == 0) {
+                                            viewModel.toggleCategorySelection(category.id)
+                                        }
+                                    } else {
+                                        showActionDialog = category
+                                    }
+                                },
+                                onLongClick = {
+                                    if (!uiState.isMultiSelectMode) {
+                                        viewModel.toggleMultiSelectMode()
+                                        if (category.itemCount == 0) {
+                                            viewModel.toggleCategorySelection(category.id)
+                                        }
+                                    }
+                                },
+                                isMultiSelectMode = uiState.isMultiSelectMode,
+                                isSelected = uiState.selectedCategories.contains(category.id),
+                                isSelectable = category.itemCount == 0
                             )
                             HorizontalDivider()
                         }
@@ -162,30 +231,68 @@ fun CategoryManagementScreen(
 @Composable
 fun CategoryItem(
     category: CategoryWithCount,
-    onLongClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    isMultiSelectMode: Boolean,
+    isSelected: Boolean,
+    isSelectable: Boolean
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .height(64.dp)
             .combinedClickable(
-                onClick = { },
+                onClick = onClick,
                 onLongClick = onLongClick
             )
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = category.name,
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.weight(1f)
+        ) {
+            // Always reserve space for checkbox to prevent layout shift
+            Box(
+                modifier = Modifier.size(40.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isMultiSelectMode) {
+                    Checkbox(
+                        checked = isSelected,
+                        onCheckedChange = { onClick() },
+                        enabled = isSelectable
+                    )
+                }
+            }
+            Text(
+                text = category.name,
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (isMultiSelectMode && !isSelectable) {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                },
+                maxLines = 1
+            )
+        }
 
         Badge(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = if (category.itemCount == 0) {
+                MaterialTheme.colorScheme.surfaceVariant
+            } else {
+                MaterialTheme.colorScheme.primary
+            }
         ) {
             Text(
                 text = category.itemCount.toString(),
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = if (category.itemCount == 0) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.onPrimary
+                },
                 modifier = Modifier.padding(horizontal = 8.dp)
             )
         }
