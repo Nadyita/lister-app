@@ -43,7 +43,7 @@ fun CreateListDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.button_close))
+                Text(stringResource(R.string.button_cancel))
             }
         }
     )
@@ -85,7 +85,7 @@ fun EditListDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.button_close))
+                Text(stringResource(R.string.button_cancel))
             }
         }
     )
@@ -108,7 +108,7 @@ fun DeleteListDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.button_close))
+                Text(stringResource(R.string.button_cancel))
             }
         }
     )

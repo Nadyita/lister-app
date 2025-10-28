@@ -176,7 +176,7 @@ fun CreateItemDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.button_close))
+                Text(stringResource(R.string.button_cancel))
             }
         }
     )
@@ -311,7 +311,7 @@ fun EditItemDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.button_close))
+                Text(stringResource(R.string.button_cancel))
             }
         }
     )

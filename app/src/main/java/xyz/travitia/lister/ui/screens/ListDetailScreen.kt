@@ -251,6 +251,10 @@ fun ItemsList(
                         onClick = { onItemClick(item) },
                         onLongClick = { onItemLongClick(item) }
                     )
+                    HorizontalDivider(
+                        thickness = 0.5.dp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                    )
                 }
             }
         }
