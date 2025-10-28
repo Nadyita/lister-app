@@ -21,7 +21,7 @@ class SettingsPreferences(private val context: Context) {
         private val SUGGESTION_COUNT_KEY = intPreferencesKey("suggestion_count")
         private val PRIMARY_COLOR_KEY = stringPreferencesKey("primary_color")
         private val LIST_ORDER_KEY = stringPreferencesKey("list_order")
-        const val DEFAULT_BASE_URL = "http://192.168.42.12/api"
+        const val DEFAULT_BASE_URL = ""
         const val DEFAULT_SUGGESTION_COUNT = 3
     }
 
@@ -63,7 +63,8 @@ class SettingsPreferences(private val context: Context) {
 
     suspend fun setBaseUrl(url: String) {
         context.dataStore.edit { preferences ->
-            preferences[BASE_URL_KEY] = url
+            val normalizedUrl = if (url.isNotBlank() && !url.endsWith("/")) "$url/" else url
+            preferences[BASE_URL_KEY] = normalizedUrl
         }
     }
 
