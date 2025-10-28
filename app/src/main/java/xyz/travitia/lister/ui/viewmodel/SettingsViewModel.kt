@@ -14,6 +14,7 @@ data class SettingsUiState(
     val bearerToken: String = "",
     val suggestionCount: Int = SettingsPreferences.DEFAULT_SUGGESTION_COUNT,
     val primaryColor: PrimaryColor = PrimaryColor.DEFAULT,
+    val useMaterialYou: Boolean = false,
     val isSaving: Boolean = false
 )
 
@@ -47,15 +48,28 @@ class SettingsViewModel(private val settingsPreferences: SettingsPreferences) : 
                 _uiState.value = _uiState.value.copy(primaryColor = color)
             }
         }
+        viewModelScope.launch {
+            settingsPreferences.useMaterialYou.collect { enabled ->
+                _uiState.value = _uiState.value.copy(useMaterialYou = enabled)
+            }
+        }
     }
 
-    fun saveSettings(url: String, token: String, suggestionCount: Int, primaryColor: PrimaryColor, onSuccess: () -> Unit) {
+    fun saveSettings(
+        url: String,
+        token: String,
+        suggestionCount: Int,
+        primaryColor: PrimaryColor,
+        useMaterialYou: Boolean,
+        onSuccess: () -> Unit
+    ) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isSaving = true)
             settingsPreferences.setBaseUrl(url)
             settingsPreferences.setBearerToken(token.ifBlank { null })
             settingsPreferences.setSuggestionCount(suggestionCount)
             settingsPreferences.setPrimaryColor(primaryColor)
+            settingsPreferences.setUseMaterialYou(useMaterialYou)
             _uiState.value = _uiState.value.copy(isSaving = false)
             onSuccess()
         }

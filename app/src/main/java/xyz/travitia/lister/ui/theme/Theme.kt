@@ -1,9 +1,12 @@
 package xyz.travitia.lister.ui.theme
 
 import android.app.Activity
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -44,13 +47,17 @@ fun ListerTheme(
 ) {
     val context = LocalContext.current
     val application = context.applicationContext as ListerApplication
-    val selectedPrimaryColor by application.settingsPreferences.primaryColor.collectAsState(initial = PrimaryColor.DEFAULT)
-
-    val primaryColor = selectedPrimaryColor.toColor()
+    val selectedPrimaryColor by application.settingsPreferences.primaryColor.collectAsState(
+        initial = PrimaryColor.DEFAULT
+    )
+    val useMaterialYou by application.settingsPreferences.useMaterialYou.collectAsState(initial = false)
 
     val colorScheme = when {
-        darkTheme -> getDarkColorScheme(primaryColor)
-        else -> getLightColorScheme(primaryColor)
+        useMaterialYou && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        darkTheme -> getDarkColorScheme(selectedPrimaryColor.toColor())
+        else -> getLightColorScheme(selectedPrimaryColor.toColor())
     }
 
     val view = LocalView.current

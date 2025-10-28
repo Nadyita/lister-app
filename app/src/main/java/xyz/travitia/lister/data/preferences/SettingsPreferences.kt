@@ -3,6 +3,7 @@ package xyz.travitia.lister.data.preferences
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -22,6 +23,7 @@ class SettingsPreferences(private val context: Context) {
         private val PRIMARY_COLOR_KEY = stringPreferencesKey("primary_color")
         private val LIST_ORDER_KEY = stringPreferencesKey("list_order")
         private val HIDDEN_LISTS_KEY = stringPreferencesKey("hidden_lists")
+        private val USE_MATERIAL_YOU_KEY = booleanPreferencesKey("use_material_you")
         const val DEFAULT_BASE_URL = ""
         const val DEFAULT_SUGGESTION_COUNT = 3
     }
@@ -71,6 +73,10 @@ class SettingsPreferences(private val context: Context) {
         }
     }
 
+    val useMaterialYou: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[USE_MATERIAL_YOU_KEY] ?: false
+    }
+
     suspend fun setBaseUrl(url: String) {
         context.dataStore.edit { preferences ->
             val normalizedUrl = if (url.isNotBlank() && !url.endsWith("/")) "$url/" else url
@@ -111,6 +117,12 @@ class SettingsPreferences(private val context: Context) {
         context.dataStore.edit { preferences ->
             val hiddenString = hiddenListIds.joinToString(",")
             preferences[HIDDEN_LISTS_KEY] = hiddenString
+        }
+    }
+
+    suspend fun setUseMaterialYou(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[USE_MATERIAL_YOU_KEY] = enabled
         }
     }
 }

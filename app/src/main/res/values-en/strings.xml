@@ -40,6 +40,8 @@
     <string name="settings_suggestion_count_placeholder">3</string>
     <string name="settings_suggestion_count_hint">Number of suggestions when adding items (0 = unlimited, 1–100)</string>
     <string name="settings_primary_color_label">Primary Color:</string>
+    <string name="settings_use_material_you">Use Material You</string>
+    <string name="settings_use_material_you_hint">Uses system colors from wallpaper (Android 12+)</string>
     <string name="settings_manage_categories">Manage Categories</string>
     <string name="settings_base_url_hint">Note: The base URL should end with /api.</string>
     <string name="settings_base_url_example">Example: http://192.168.0.1/api</string>

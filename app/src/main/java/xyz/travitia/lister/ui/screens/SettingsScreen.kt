@@ -1,5 +1,6 @@
 package xyz.travitia.lister.ui.screens
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -34,12 +35,17 @@ fun SettingsScreen(
     var bearerToken by remember { mutableStateOf(uiState.bearerToken) }
     var suggestionCount by remember { mutableStateOf(uiState.suggestionCount.toString()) }
     var selectedColor by remember { mutableStateOf(uiState.primaryColor) }
+    var useMaterialYou by remember { mutableStateOf(uiState.useMaterialYou) }
 
-    LaunchedEffect(uiState.baseUrl, uiState.bearerToken, uiState.suggestionCount, uiState.primaryColor) {
+    val isMaterialYouAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+
+    LaunchedEffect(uiState.baseUrl, uiState.bearerToken, uiState.suggestionCount, uiState.primaryColor,
+        uiState.useMaterialYou) {
         baseUrl = uiState.baseUrl
         bearerToken = uiState.bearerToken
         suggestionCount = uiState.suggestionCount.toString()
         selectedColor = uiState.primaryColor
+        useMaterialYou = uiState.useMaterialYou
     }
 
     Scaffold(
@@ -148,16 +154,48 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            if (isMaterialYouAvailable) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = stringResource(R.string.settings_use_material_you),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = stringResource(R.string.settings_use_material_you_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Switch(
+                        checked = useMaterialYou,
+                        onCheckedChange = { useMaterialYou = it }
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             Text(
                 text = stringResource(R.string.settings_primary_color_label),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                color = if (isMaterialYouAvailable && useMaterialYou) {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             ColorSelectionGrid(
                 selectedColor = selectedColor,
-                onColorSelected = { selectedColor = it }
+                onColorSelected = { selectedColor = it },
+                enabled = !isMaterialYouAvailable || !useMaterialYou
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -165,7 +203,7 @@ fun SettingsScreen(
             Button(
                 onClick = {
                     val count = suggestionCount.toIntOrNull() ?: 3
-                    viewModel.saveSettings(baseUrl, bearerToken, count, selectedColor) {
+                    viewModel.saveSettings(baseUrl, bearerToken, count, selectedColor, useMaterialYou) {
                         onNavigateBack()
                     }
                 },
@@ -212,7 +250,8 @@ fun SettingsScreen(
 @Composable
 fun ColorSelectionGrid(
     selectedColor: PrimaryColor,
-    onColorSelected: (PrimaryColor) -> Unit
+    onColorSelected: (PrimaryColor) -> Unit,
+    enabled: Boolean = true
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -230,8 +269,9 @@ fun ColorSelectionGrid(
                     ColorOption(
                         color = color,
                         isSelected = color == selectedColor,
-                        onSelect = { onColorSelected(color) },
-                        modifier = Modifier.weight(1f)
+                        onSelect = { if (enabled) onColorSelected(color) },
+                        modifier = Modifier.weight(1f),
+                        enabled = enabled
                     )
                 }
                 repeat(4 - row.size) {
@@ -247,11 +287,12 @@ fun ColorOption(
     color: PrimaryColor,
     isSelected: Boolean,
     onSelect: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Column(
         modifier = modifier
-            .clickable(onClick = onSelect)
+            .clickable(enabled = enabled, onClick = onSelect)
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -260,7 +301,7 @@ fun ColorOption(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(color.toColor())
+                .background(color.toColor().copy(alpha = if (enabled) 1f else 0.38f))
                 .then(
                     if (isSelected) {
                         Modifier.border(3.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
@@ -273,7 +314,11 @@ fun ColorOption(
         Text(
             text = stringResource(color.nameResId),
             style = MaterialTheme.typography.bodySmall,
-            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+            color = if (enabled) {
+                if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+            } else {
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+            }
         )
     }
 }
