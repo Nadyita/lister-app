@@ -10,12 +10,13 @@ import xyz.travitia.lister.ui.viewmodel.ListOverviewViewModel
 import xyz.travitia.lister.ui.viewmodel.SettingsViewModel
 
 class ListOverviewViewModelFactory(
-    private val repository: ListerRepository
+    private val repository: ListerRepository,
+    private val settingsPreferences: SettingsPreferences
 ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(ListOverviewViewModel::class.java)) {
-            return ListOverviewViewModel(repository) as T
+            return ListOverviewViewModel(repository, settingsPreferences) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

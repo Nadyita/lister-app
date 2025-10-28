@@ -5,10 +5,14 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DragHandle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +21,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.ReorderableLazyListState
+import sh.calvin.reorderable.rememberReorderableLazyListState
 import xyz.travitia.lister.R
 import xyz.travitia.lister.data.model.ShoppingListWithCount
 import xyz.travitia.lister.ui.components.CreateListDialog
@@ -41,13 +48,35 @@ fun ListOverviewScreen(
     var showEditDialog by remember { mutableStateOf<ShoppingListWithCount?>(null) }
     var showDeleteDialog by remember { mutableStateOf<ShoppingListWithCount?>(null) }
 
+    var localLists by remember(uiState.lists) { mutableStateOf(uiState.lists) }
+
+    val lazyListState = rememberLazyListState()
+    val reorderableLazyListState = rememberReorderableLazyListState(
+        lazyListState = lazyListState,
+        onMove = { from, to ->
+            localLists = localLists.toMutableList().apply {
+                add(to.index, removeAt(from.index))
+            }
+        }
+    )
+
+    LaunchedEffect(uiState.isReorderMode) {
+        if (!uiState.isReorderMode && localLists != uiState.lists) {
+            // Save when exiting reorder mode
+            viewModel.reorderLists(localLists)
+        }
+        if (uiState.isReorderMode) {
+            // Reset local list when entering reorder mode
+            localLists = uiState.lists
+        }
+    }
+
     LaunchedEffect(uiState.isLoading) {
         if (!uiState.isLoading) {
             isRefreshing = false
         }
     }
 
-    // Show error as Snackbar only if lists are not empty
     LaunchedEffect(uiState.error) {
         uiState.error?.let { errorMessage ->
             if (uiState.lists.isNotEmpty()) {
@@ -66,22 +95,52 @@ fun ListOverviewScreen(
             TopAppBar(
                 title = { Text(stringResource(R.string.list_overview_title)) },
                 actions = {
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.cd_settings))
+                    if (!uiState.isReorderMode) {
+                        IconButton(onClick = onNavigateToSettings) {
+                            Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.cd_settings))
+                        }
                     }
                 }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showCreateDialog = true },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(R.string.cd_new_list),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
+            if (uiState.isReorderMode) {
+                FloatingActionButton(
+                    onClick = { viewModel.toggleReorderMode() },
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Close reorder mode",
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    SmallFloatingActionButton(
+                        onClick = { viewModel.toggleReorderMode() },
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
+                    ) {
+                        Icon(
+                            Icons.Default.SwapVert,
+                            contentDescription = "Reorder lists",
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                    FloatingActionButton(
+                        onClick = { showCreateDialog = true },
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = stringResource(R.string.cd_new_list),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
             }
         }
     ) { paddingValues ->
@@ -91,6 +150,7 @@ fun ListOverviewScreen(
                 isRefreshing = true
                 viewModel.loadLists()
             },
+            swipeEnabled = !uiState.isReorderMode,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
@@ -138,16 +198,35 @@ fun ListOverviewScreen(
                         )
                     }
                     else -> {
+                        val displayLists = if (uiState.isReorderMode) localLists else uiState.lists
+                        
                         LazyColumn(
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier.fillMaxSize(),
+                            state = lazyListState
                         ) {
-                            items(uiState.lists) { list ->
-                                ListItem(
-                                    list = list,
-                                    onClick = { onNavigateToList(list.id, list.name) },
-                                    onLongClick = { showActionDialog = list }
-                                )
-                                HorizontalDivider()
+                            items(
+                                items = displayLists,
+                                key = { it.id }
+                            ) { list ->
+                                ReorderableItem(reorderableLazyListState, key = list.id) { isDragging ->
+                                    ListItem(
+                                        list = list,
+                                        onClick = {
+                                            if (!uiState.isReorderMode) {
+                                                onNavigateToList(list.id, list.name)
+                                            }
+                                        },
+                                        onLongClick = {
+                                            if (!uiState.isReorderMode) {
+                                                showActionDialog = list
+                                            }
+                                        },
+                                        isReorderMode = uiState.isReorderMode,
+                                        isDragging = isDragging,
+                                        dragModifier = Modifier.draggableHandle()
+                                    )
+                                    HorizontalDivider()
+                                }
                             }
                         }
                     }
@@ -212,35 +291,58 @@ fun ListOverviewScreen(
 fun ListItem(
     list: ShoppingListWithCount,
     onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: () -> Unit,
+    isReorderMode: Boolean,
+    isDragging: Boolean,
+    dragModifier: Modifier
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    val elevation = if (isDragging) 8.dp else 0.dp
+    
+    Surface(
+        shadowElevation = elevation,
+        tonalElevation = if (isDragging) 4.dp else 0.dp
     ) {
-        Text(
-            text = list.name,
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-        list.count?.let { count ->
-            Badge(
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Text(
-                    text = count.toString(),
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick
                 )
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                if (isReorderMode) {
+                    Icon(
+                        Icons.Default.DragHandle,
+                        contentDescription = "Drag handle",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = dragModifier
+                    )
+                }
+                Text(
+                    text = list.name,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            list.count?.let { count ->
+                Badge(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ) {
+                    Text(
+                        text = count.toString(),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                }
             }
         }
     }
 }
-

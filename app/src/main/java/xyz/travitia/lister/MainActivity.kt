@@ -46,7 +46,7 @@ fun ListerApp() {
     ) {
         composable(Screen.ListOverview.route) {
             val viewModel: ListOverviewViewModel = viewModel(
-                factory = ListOverviewViewModelFactory(application.repository)
+                factory = ListOverviewViewModelFactory(application.repository, application.settingsPreferences)
             )
             ListOverviewScreen(
                 viewModel = viewModel,

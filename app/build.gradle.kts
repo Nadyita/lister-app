@@ -121,6 +121,9 @@ dependencies {
     // Swipe Refresh
     implementation("com.google.accompanist:accompanist-swiperefresh:0.36.0")
 
+    // Reorderable (drag and drop)
+    implementation("sh.calvin.reorderable:reorderable:2.4.0")
+
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

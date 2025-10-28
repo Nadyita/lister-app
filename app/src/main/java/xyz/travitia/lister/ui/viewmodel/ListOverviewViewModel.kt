@@ -7,21 +7,51 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import xyz.travitia.lister.data.model.ShoppingListWithCount
+import xyz.travitia.lister.data.preferences.SettingsPreferences
 import xyz.travitia.lister.data.repository.ListerRepository
 
 data class ListOverviewUiState(
     val lists: List<ShoppingListWithCount> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val isReorderMode: Boolean = false
 )
 
-class ListOverviewViewModel(private val repository: ListerRepository) : ViewModel() {
+class ListOverviewViewModel(
+    private val repository: ListerRepository,
+    private val settingsPreferences: SettingsPreferences
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ListOverviewUiState())
     val uiState: StateFlow<ListOverviewUiState> = _uiState.asStateFlow()
 
+    private var listOrder: Map<Int, Int> = emptyMap()
+
     init {
+        loadOrder()
         loadLists()
+    }
+
+    private fun loadOrder() {
+        viewModelScope.launch {
+            settingsPreferences.listOrder.collect { order ->
+                listOrder = order
+                // Re-sort lists when order changes
+                val currentLists = _uiState.value.lists
+                if (currentLists.isNotEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        lists = sortListsByOrder(currentLists)
+                    )
+                }
+            }
+        }
+    }
+
+    private fun sortListsByOrder(lists: List<ShoppingListWithCount>): List<ShoppingListWithCount> {
+        return lists.sortedWith(compareBy(
+            { listOrder[it.id] ?: Int.MAX_VALUE },
+            { it.id }
+        ))
     }
 
     fun loadLists() {
@@ -30,7 +60,7 @@ class ListOverviewViewModel(private val repository: ListerRepository) : ViewMode
             repository.getLists().fold(
                 onSuccess = { lists ->
                     _uiState.value = _uiState.value.copy(
-                        lists = lists,
+                        lists = sortListsByOrder(lists),
                         isLoading = false
                     )
                 },
@@ -88,6 +118,22 @@ class ListOverviewViewModel(private val repository: ListerRepository) : ViewMode
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun toggleReorderMode() {
+        _uiState.value = _uiState.value.copy(
+            isReorderMode = !_uiState.value.isReorderMode
+        )
+    }
+
+    fun reorderLists(newOrder: List<ShoppingListWithCount>) {
+        viewModelScope.launch {
+            val orderMap = newOrder.mapIndexed { index, list ->
+                list.id to index
+            }.toMap()
+            settingsPreferences.setListOrder(orderMap)
+            _uiState.value = _uiState.value.copy(lists = newOrder)
+        }
     }
 }
 

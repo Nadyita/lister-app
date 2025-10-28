@@ -20,6 +20,7 @@ class SettingsPreferences(private val context: Context) {
         private val BEARER_TOKEN_KEY = stringPreferencesKey("bearer_token")
         private val SUGGESTION_COUNT_KEY = intPreferencesKey("suggestion_count")
         private val PRIMARY_COLOR_KEY = stringPreferencesKey("primary_color")
+        private val LIST_ORDER_KEY = stringPreferencesKey("list_order")
         const val DEFAULT_BASE_URL = "http://192.168.42.12/api"
         const val DEFAULT_SUGGESTION_COUNT = 3
     }
@@ -38,6 +39,26 @@ class SettingsPreferences(private val context: Context) {
 
     val primaryColor: Flow<PrimaryColor> = context.dataStore.data.map { preferences ->
         PrimaryColor.fromName(preferences[PRIMARY_COLOR_KEY])
+    }
+
+    val listOrder: Flow<Map<Int, Int>> = context.dataStore.data.map { preferences ->
+        val orderString = preferences[LIST_ORDER_KEY] ?: ""
+        if (orderString.isBlank()) {
+            emptyMap()
+        } else {
+            orderString.split(",")
+                .mapNotNull { entry ->
+                    val parts = entry.split(":")
+                    if (parts.size == 2) {
+                        parts[0].toIntOrNull()?.let { id ->
+                            parts[1].toIntOrNull()?.let { order ->
+                                id to order
+                            }
+                        }
+                    } else null
+                }
+                .toMap()
+        }
     }
 
     suspend fun setBaseUrl(url: String) {
@@ -65,6 +86,13 @@ class SettingsPreferences(private val context: Context) {
     suspend fun setPrimaryColor(color: PrimaryColor) {
         context.dataStore.edit { preferences ->
             preferences[PRIMARY_COLOR_KEY] = color.name
+        }
+    }
+
+    suspend fun setListOrder(order: Map<Int, Int>) {
+        context.dataStore.edit { preferences ->
+            val orderString = order.entries.joinToString(",") { "${it.key}:${it.value}" }
+            preferences[LIST_ORDER_KEY] = orderString
         }
     }
 }
