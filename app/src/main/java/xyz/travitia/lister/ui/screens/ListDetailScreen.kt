@@ -1,6 +1,8 @@
 package xyz.travitia.lister.ui.screens
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import xyz.travitia.lister.R
@@ -224,6 +227,7 @@ fun ItemsList(
     ) {
         allGroups.forEachIndexed { _, (category, categoryItems) ->
             val isInCart = category == inCartString
+            val isNoCategory = category == noCategoryString
             val color = if (isInCart) ListerGray else primaryColor
             val isExpanded = expandedCategories[category] ?: true
 
@@ -233,7 +237,7 @@ fun ItemsList(
                     color = color,
                     isExpanded = isExpanded,
                     onToggle = { expandedCategories[category] = !isExpanded },
-                    onLongClick = if (!isInCart) {
+                    onLongClick = if (!isInCart && !isNoCategory) {
                         { onCategoryLongClick(category) }
                     } else {
                         null
@@ -241,20 +245,25 @@ fun ItemsList(
                 )
             }
 
-            if (isExpanded) {
-                items(
-                    items = categoryItems,
-                    key = { item -> "item_${item.id}" }
-                ) { item ->
-                    ItemRow(
-                        item = item,
-                        onClick = { onItemClick(item) },
-                        onLongClick = { onItemLongClick(item) }
-                    )
-                    HorizontalDivider(
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
-                    )
+            item(key = "content_$category") {
+                AnimatedVisibility(
+                    visible = isExpanded,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    Column {
+                        categoryItems.forEach { item ->
+                            ItemRow(
+                                item = item,
+                                onClick = { onItemClick(item) },
+                                onLongClick = { onItemLongClick(item) }
+                            )
+                            HorizontalDivider(
+                                thickness = 0.5.dp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -281,13 +290,16 @@ fun CategoryHeader(
                 onClick = onToggle,
                 onLongClick = onLongClick
             )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = category,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontSize = 20.sp,
+                lineHeight = 24.sp
+            ),
             fontWeight = FontWeight.Bold,
             color = color
         )
@@ -320,7 +332,10 @@ fun ItemRow(
     ) {
         Text(
             text = item.name,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontSize = 20.sp,
+                lineHeight = 24.sp
+            ),
             modifier = Modifier.weight(1f)
         )
 

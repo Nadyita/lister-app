@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import xyz.travitia.lister.R
 import xyz.travitia.lister.data.model.CategoryWithCount
 import xyz.travitia.lister.ui.components.CategoryActionDialog
@@ -269,7 +270,10 @@ fun CategoryItem(
             }
             Text(
                 text = category.name,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontSize = 20.sp,
+                    lineHeight = 24.sp
+                ),
                 color = if (isMultiSelectMode && !isSelectable) {
                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                 } else {
