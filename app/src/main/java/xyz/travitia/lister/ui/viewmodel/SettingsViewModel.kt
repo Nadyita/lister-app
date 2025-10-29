@@ -92,5 +92,12 @@ class SettingsViewModel(private val settingsPreferences: SettingsPreferences) : 
             onSuccess()
         }
     }
+
+    fun saveThemeSettings(useMaterialYou: Boolean, primaryColor: PrimaryColor) {
+        viewModelScope.launch {
+            settingsPreferences.setUseMaterialYou(useMaterialYou)
+            settingsPreferences.setPrimaryColor(primaryColor)
+        }
+    }
 }
 

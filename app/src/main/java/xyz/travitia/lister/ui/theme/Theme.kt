@@ -65,7 +65,15 @@ fun ListerTheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            
+            // Use color-specific status bar icon color when not using Material You
+            val shouldUseLightIcons = if (useMaterialYou && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                !darkTheme
+            } else {
+                selectedPrimaryColor.useLightStatusBarIcons
+            }
+            
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !shouldUseLightIcons
         }
     }
 

@@ -11,8 +11,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +42,8 @@ fun SettingsScreen(
     var useMaterialYou by remember { mutableStateOf(uiState.useMaterialYou) }
     var selectedFontSize by remember { mutableStateOf(uiState.fontSize) }
     var useCompactMode by remember { mutableStateOf(uiState.useCompactMode) }
+    
+    val coroutineScope = rememberCoroutineScope()
 
     val isMaterialYouAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
@@ -144,12 +148,27 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedButton(
-                onClick = onNavigateToCategories,
-                modifier = Modifier.fillMaxWidth()
+            // Manage Categories as List Item
+            HorizontalDivider()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onNavigateToCategories)
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(stringResource(R.string.settings_manage_categories))
+                Text(
+                    text = stringResource(R.string.settings_manage_categories),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
             }
+            HorizontalDivider()
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -179,32 +198,42 @@ fun SettingsScreen(
                     }
                     Switch(
                         checked = useMaterialYou,
-                        onCheckedChange = { useMaterialYou = it }
+                        onCheckedChange = { 
+                            useMaterialYou = it
+                            // Apply immediately
+                            coroutineScope.launch {
+                                viewModel.saveThemeSettings(useMaterialYou, selectedColor)
+                            }
+                        }
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            Text(
-                text = stringResource(R.string.settings_primary_color_label),
-                style = MaterialTheme.typography.bodyLarge,
-                color = if (isMaterialYouAvailable && useMaterialYou) {
-                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                }
-            )
+            // Only show color selection if Material You is not active
+            if (!isMaterialYouAvailable || !useMaterialYou) {
+                Text(
+                    text = stringResource(R.string.settings_primary_color_label),
+                    style = MaterialTheme.typography.bodyLarge
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            ColorSelectionGrid(
-                selectedColor = selectedColor,
-                onColorSelected = { selectedColor = it },
-                enabled = !isMaterialYouAvailable || !useMaterialYou
-            )
+                ColorSelectionGrid(
+                    selectedColor = selectedColor,
+                    onColorSelected = { 
+                        selectedColor = it
+                        // Apply immediately
+                        coroutineScope.launch {
+                            viewModel.saveThemeSettings(useMaterialYou, selectedColor)
+                        }
+                    },
+                    enabled = true
+                )
 
-            Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
             Text(
                 text = stringResource(R.string.settings_font_size_label),
@@ -404,8 +433,8 @@ fun FontSizeOption(
         onClick = onSelect,
         modifier = modifier,
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
-            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
         ),
         border = if (isSelected) {
             BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
