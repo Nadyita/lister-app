@@ -27,6 +27,7 @@
     <string name="rename_category_dialog_title">Rename Category</string>
     <string name="category_name_label">Name:</string>
     <string name="cannot_rename_no_category">This category cannot be renamed</string>
+    <string name="cannot_rename_in_cart">This category cannot be renamed</string>
 
     <!-- Settings -->
     <string name="settings_title">Settings</string>

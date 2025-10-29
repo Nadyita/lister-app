@@ -163,6 +163,13 @@ fun ListDetailScreen(
                                         message = context.getString(R.string.cannot_rename_no_category)
                                     )
                                 }
+                            },
+                            onInCartLongClick = {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = context.getString(R.string.cannot_rename_in_cart)
+                                    )
+                                }
                             }
                         )
                     }
@@ -219,7 +226,8 @@ fun ItemsList(
     onItemClick: (Item) -> Unit,
     onItemLongClick: (Item) -> Unit,
     onCategoryLongClick: (String) -> Unit,
-    onNoCategoryLongClick: () -> Unit
+    onNoCategoryLongClick: () -> Unit,
+    onInCartLongClick: () -> Unit
 ) {
     val itemsNotInCart = items.filter { !it.inCart }
     val itemsInCart = items.filter { it.inCart }
@@ -253,12 +261,11 @@ fun ItemsList(
                     color = color,
                     isExpanded = isExpanded,
                     onToggle = { expandedCategories[category] = !isExpanded },
-                    onLongClick = if (!isInCart && !isNoCategory) {
-                        { onCategoryLongClick(category) }
-                    } else if (isNoCategory) {
-                        onNoCategoryLongClick
-                    } else {
-                        null
+                    onLongClick = when {
+                        !isInCart && !isNoCategory -> {{ onCategoryLongClick(category) }}
+                        isNoCategory -> onNoCategoryLongClick
+                        isInCart -> onInCartLongClick
+                        else -> null
                     }
                 )
             }
