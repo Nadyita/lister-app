@@ -1,5 +1,6 @@
 package xyz.travitia.lister.ui.screens
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -92,6 +93,11 @@ fun ListOverviewScreen(
                 viewModel.clearError()
             }
         }
+    }
+
+    // Handle back button in reorder mode
+    BackHandler(enabled = uiState.isReorderMode) {
+        viewModel.toggleReorderMode()
     }
 
     Scaffold(
