@@ -44,6 +44,7 @@
     <string name="settings_primary_color_label">Primärfarbe:</string>
     <string name="settings_use_material_you">Material You verwenden</string>
     <string name="settings_use_material_you_hint">Verwendet die Systemfarben aus dem Wallpaper (Android 12+)</string>
+    <string name="settings_font_size_label">Schriftgröße:</string>
     <string name="settings_manage_categories">Kategorien verwalten</string>
     <string name="settings_base_url_hint">Hinweis: Die Base URL sollte mit /api enden.</string>
     <string name="settings_base_url_example">Beispiel: http://192.168.0.1/api</string>
@@ -67,6 +68,11 @@
     <string name="color_teal">Türkis</string>
     <string name="color_indigo">Indigo</string>
     <string name="color_brown">Braun</string>
+
+    <!-- Font Sizes -->
+    <string name="font_size_small">Klein</string>
+    <string name="font_size_medium">Mittel</string>
+    <string name="font_size_large">Groß</string>
 
     <!-- Buttons -->
     <string name="button_create">ERSTELLEN</string>

@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import xyz.travitia.lister.data.model.FontSize
 import xyz.travitia.lister.data.model.PrimaryColor
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -24,6 +25,7 @@ class SettingsPreferences(private val context: Context) {
         private val LIST_ORDER_KEY = stringPreferencesKey("list_order")
         private val HIDDEN_LISTS_KEY = stringPreferencesKey("hidden_lists")
         private val USE_MATERIAL_YOU_KEY = booleanPreferencesKey("use_material_you")
+        private val FONT_SIZE_KEY = stringPreferencesKey("font_size")
         const val DEFAULT_BASE_URL = ""
         const val DEFAULT_SUGGESTION_COUNT = 3
     }
@@ -77,6 +79,10 @@ class SettingsPreferences(private val context: Context) {
         preferences[USE_MATERIAL_YOU_KEY] ?: false
     }
 
+    val fontSize: Flow<FontSize> = context.dataStore.data.map { preferences ->
+        FontSize.fromName(preferences[FONT_SIZE_KEY])
+    }
+
     suspend fun setBaseUrl(url: String) {
         context.dataStore.edit { preferences ->
             val normalizedUrl = if (url.isNotBlank() && !url.endsWith("/")) "$url/" else url
@@ -123,6 +129,12 @@ class SettingsPreferences(private val context: Context) {
     suspend fun setUseMaterialYou(enabled: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[USE_MATERIAL_YOU_KEY] = enabled
+        }
+    }
+
+    suspend fun setFontSize(fontSize: FontSize) {
+        context.dataStore.edit { preferences ->
+            preferences[FONT_SIZE_KEY] = fontSize.name
         }
     }
 }

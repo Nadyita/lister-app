@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import xyz.travitia.lister.data.model.FontSize
 import xyz.travitia.lister.data.model.PrimaryColor
 import xyz.travitia.lister.data.preferences.SettingsPreferences
 
@@ -15,6 +16,7 @@ data class SettingsUiState(
     val suggestionCount: Int = SettingsPreferences.DEFAULT_SUGGESTION_COUNT,
     val primaryColor: PrimaryColor = PrimaryColor.DEFAULT,
     val useMaterialYou: Boolean = false,
+    val fontSize: FontSize = FontSize.DEFAULT,
     val isSaving: Boolean = false
 )
 
@@ -53,6 +55,11 @@ class SettingsViewModel(private val settingsPreferences: SettingsPreferences) : 
                 _uiState.value = _uiState.value.copy(useMaterialYou = enabled)
             }
         }
+        viewModelScope.launch {
+            settingsPreferences.fontSize.collect { size ->
+                _uiState.value = _uiState.value.copy(fontSize = size)
+            }
+        }
     }
 
     fun saveSettings(
@@ -61,6 +68,7 @@ class SettingsViewModel(private val settingsPreferences: SettingsPreferences) : 
         suggestionCount: Int,
         primaryColor: PrimaryColor,
         useMaterialYou: Boolean,
+        fontSize: FontSize,
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
@@ -70,6 +78,7 @@ class SettingsViewModel(private val settingsPreferences: SettingsPreferences) : 
             settingsPreferences.setSuggestionCount(suggestionCount)
             settingsPreferences.setPrimaryColor(primaryColor)
             settingsPreferences.setUseMaterialYou(useMaterialYou)
+            settingsPreferences.setFontSize(fontSize)
             _uiState.value = _uiState.value.copy(isSaving = false)
             onSuccess()
         }

@@ -31,6 +31,9 @@ import xyz.travitia.lister.ui.components.CreateListDialog
 import xyz.travitia.lister.ui.components.DeleteListDialog
 import xyz.travitia.lister.ui.components.EditListDialog
 import xyz.travitia.lister.ui.components.ListActionDialog
+import xyz.travitia.lister.ui.theme.rememberBadgeFontSize
+import xyz.travitia.lister.ui.theme.rememberBadgePadding
+import xyz.travitia.lister.ui.theme.rememberBodyFontSize
 import xyz.travitia.lister.ui.viewmodel.ListOverviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -307,6 +310,9 @@ fun ListItem(
     onVisibilityToggle: () -> Unit
 ) {
     val elevation = if (isDragging) 8.dp else 0.dp
+    val bodyFontSize = rememberBodyFontSize()
+    val badgeFontSize = rememberBadgeFontSize()
+    val badgePadding = rememberBadgePadding()
     
     Surface(
         shadowElevation = elevation,
@@ -339,8 +345,8 @@ fun ListItem(
                 Text(
                     text = list.name,
                     style = MaterialTheme.typography.bodyLarge.copy(
-                        fontSize = 20.sp,
-                        lineHeight = 24.sp
+                        fontSize = bodyFontSize,
+                        lineHeight = bodyFontSize * 1.2f
                     )
                 )
             }
@@ -357,8 +363,9 @@ fun ListItem(
                     ) {
                         Text(
                             text = count.toString(),
+                            fontSize = badgeFontSize,
                             color = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            modifier = Modifier.padding(horizontal = badgePadding)
                         )
                     }
                 }

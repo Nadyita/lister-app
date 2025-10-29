@@ -22,6 +22,9 @@ import xyz.travitia.lister.data.model.CategoryWithCount
 import xyz.travitia.lister.ui.components.CategoryActionDialog
 import xyz.travitia.lister.ui.components.DeleteCategoryDialog
 import xyz.travitia.lister.ui.components.RenameCategoryDialog
+import xyz.travitia.lister.ui.theme.rememberBadgeFontSize
+import xyz.travitia.lister.ui.theme.rememberBadgePadding
+import xyz.travitia.lister.ui.theme.rememberBodyFontSize
 import xyz.travitia.lister.ui.viewmodel.CategoryManagementViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -238,6 +241,10 @@ fun CategoryItem(
     isSelected: Boolean,
     isSelectable: Boolean
 ) {
+    val bodyFontSize = rememberBodyFontSize()
+    val badgeFontSize = rememberBadgeFontSize()
+    val badgePadding = rememberBadgePadding()
+    
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -271,8 +278,8 @@ fun CategoryItem(
             Text(
                 text = category.name,
                 style = MaterialTheme.typography.bodyLarge.copy(
-                    fontSize = 20.sp,
-                    lineHeight = 24.sp
+                    fontSize = bodyFontSize,
+                    lineHeight = bodyFontSize * 1.2f
                 ),
                 color = if (isMultiSelectMode && !isSelectable) {
                     MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
@@ -292,12 +299,13 @@ fun CategoryItem(
         ) {
             Text(
                 text = category.itemCount.toString(),
+                fontSize = badgeFontSize,
                 color = if (category.itemCount == 0) {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 } else {
                     MaterialTheme.colorScheme.onPrimary
                 },
-                modifier = Modifier.padding(horizontal = 8.dp)
+                modifier = Modifier.padding(horizontal = badgePadding)
             )
         }
     }

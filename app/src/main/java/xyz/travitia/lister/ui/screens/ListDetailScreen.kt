@@ -40,6 +40,10 @@ import xyz.travitia.lister.ui.components.CreateItemDialog
 import xyz.travitia.lister.ui.components.EditItemDialog
 import xyz.travitia.lister.ui.theme.ListerGray
 import xyz.travitia.lister.ui.theme.ListerGreen
+import xyz.travitia.lister.ui.theme.rememberBadgeFontSize
+import xyz.travitia.lister.ui.theme.rememberBadgePadding
+import xyz.travitia.lister.ui.theme.rememberBodyFontSize
+import xyz.travitia.lister.ui.theme.rememberHeaderFontSize
 import xyz.travitia.lister.ui.viewmodel.ListDetailViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -313,6 +317,7 @@ fun CategoryHeader(
 ) {
     val cdExpand = stringResource(R.string.cd_expand)
     val cdCollapse = stringResource(R.string.cd_collapse)
+    val headerFontSize = rememberHeaderFontSize()
 
     Row(
         modifier = Modifier
@@ -329,8 +334,8 @@ fun CategoryHeader(
         Text(
             text = category,
             style = MaterialTheme.typography.labelMedium.copy(
-                fontSize = 20.sp,
-                lineHeight = 24.sp
+                fontSize = headerFontSize,
+                lineHeight = headerFontSize * 1.2f
             ),
             fontWeight = FontWeight.Bold,
             color = color
@@ -351,6 +356,10 @@ fun ItemRow(
     onClick: () -> Unit,
     onLongClick: () -> Unit
 ) {
+    val bodyFontSize = rememberBodyFontSize()
+    val badgeFontSize = rememberBadgeFontSize()
+    val badgePadding = rememberBadgePadding()
+    
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -365,8 +374,8 @@ fun ItemRow(
         Text(
             text = item.name,
             style = MaterialTheme.typography.bodyLarge.copy(
-                fontSize = 20.sp,
-                lineHeight = 24.sp
+                fontSize = bodyFontSize,
+                lineHeight = bodyFontSize * 1.2f
             ),
             modifier = Modifier.weight(1f)
         )
@@ -388,8 +397,9 @@ fun ItemRow(
                             append(" ${item.amountUnit}")
                         }
                     },
+                    fontSize = badgeFontSize,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = badgePadding)
                 )
             }
         }

@@ -3,6 +3,7 @@ package xyz.travitia.lister.ui.screens
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -20,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import xyz.travitia.lister.R
+import xyz.travitia.lister.data.model.FontSize
 import xyz.travitia.lister.data.model.PrimaryColor
 import xyz.travitia.lister.ui.viewmodel.SettingsViewModel
 
@@ -36,16 +38,18 @@ fun SettingsScreen(
     var suggestionCount by remember { mutableStateOf(uiState.suggestionCount.toString()) }
     var selectedColor by remember { mutableStateOf(uiState.primaryColor) }
     var useMaterialYou by remember { mutableStateOf(uiState.useMaterialYou) }
+    var selectedFontSize by remember { mutableStateOf(uiState.fontSize) }
 
     val isMaterialYouAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     LaunchedEffect(uiState.baseUrl, uiState.bearerToken, uiState.suggestionCount, uiState.primaryColor,
-        uiState.useMaterialYou) {
+        uiState.useMaterialYou, uiState.fontSize) {
         baseUrl = uiState.baseUrl
         bearerToken = uiState.bearerToken
         suggestionCount = uiState.suggestionCount.toString()
         selectedColor = uiState.primaryColor
         useMaterialYou = uiState.useMaterialYou
+        selectedFontSize = uiState.fontSize
     }
 
     Scaffold(
@@ -198,12 +202,26 @@ fun SettingsScreen(
                 enabled = !isMaterialYouAvailable || !useMaterialYou
             )
 
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = stringResource(R.string.settings_font_size_label),
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            FontSizeSelectionRow(
+                selectedFontSize = selectedFontSize,
+                onFontSizeSelected = { selectedFontSize = it }
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
                 onClick = {
                     val count = suggestionCount.toIntOrNull() ?: 3
-                    viewModel.saveSettings(baseUrl, bearerToken, count, selectedColor, useMaterialYou) {
+                    viewModel.saveSettings(baseUrl, bearerToken, count, selectedColor, useMaterialYou, selectedFontSize) {
                         onNavigateBack()
                     }
                 },
@@ -320,5 +338,55 @@ fun ColorOption(
                 MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
             }
         )
+    }
+}
+
+@Composable
+fun FontSizeSelectionRow(
+    selectedFontSize: FontSize,
+    onFontSizeSelected: (FontSize) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        FontSize.entries.forEach { fontSize ->
+            FontSizeOption(
+                fontSize = fontSize,
+                isSelected = fontSize == selectedFontSize,
+                onSelect = { onFontSizeSelected(fontSize) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+fun FontSizeOption(
+    fontSize: FontSize,
+    isSelected: Boolean,
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val nameResId = when (fontSize) {
+        FontSize.SMALL -> R.string.font_size_small
+        FontSize.MEDIUM -> R.string.font_size_medium
+        FontSize.LARGE -> R.string.font_size_large
+    }
+
+    OutlinedButton(
+        onClick = onSelect,
+        modifier = modifier,
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+            contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+        ),
+        border = if (isSelected) {
+            BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+        } else {
+            BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+        }
+    ) {
+        Text(stringResource(nameResId))
     }
 }
