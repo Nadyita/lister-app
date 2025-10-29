@@ -26,6 +26,7 @@
     <string name="category_in_cart">IM EINKAUFSWAGEN</string>
     <string name="rename_category_dialog_title">Kategorie umbenennen</string>
     <string name="category_name_label">Name:</string>
+    <string name="cannot_rename_no_category">Diese Kategorie kann nicht umbenannt werden</string>
 
     <!-- Settings -->
     <string name="settings_title">Einstellungen</string>

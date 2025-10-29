@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.TextRange
@@ -32,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.launch
 import xyz.travitia.lister.R
 import xyz.travitia.lister.data.model.Item
 import xyz.travitia.lister.ui.components.CreateItemDialog
@@ -50,6 +52,8 @@ fun ListDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
     var isRefreshing by remember { mutableStateOf(false) }
 
     var showCreateDialog by remember { mutableStateOf(false) }
@@ -152,6 +156,13 @@ fun ListDetailScreen(
                             },
                             onCategoryLongClick = { categoryName ->
                                 renamingCategory = categoryName
+                            },
+                            onNoCategoryLongClick = {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = context.getString(R.string.cannot_rename_no_category)
+                                    )
+                                }
                             }
                         )
                     }
@@ -207,7 +218,8 @@ fun ItemsList(
     items: List<Item>,
     onItemClick: (Item) -> Unit,
     onItemLongClick: (Item) -> Unit,
-    onCategoryLongClick: (String) -> Unit
+    onCategoryLongClick: (String) -> Unit,
+    onNoCategoryLongClick: () -> Unit
 ) {
     val itemsNotInCart = items.filter { !it.inCart }
     val itemsInCart = items.filter { it.inCart }
@@ -243,6 +255,8 @@ fun ItemsList(
                     onToggle = { expandedCategories[category] = !isExpanded },
                     onLongClick = if (!isInCart && !isNoCategory) {
                         { onCategoryLongClick(category) }
+                    } else if (isNoCategory) {
+                        onNoCategoryLongClick
                     } else {
                         null
                     }
