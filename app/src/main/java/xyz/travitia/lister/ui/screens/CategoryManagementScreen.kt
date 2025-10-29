@@ -245,6 +245,13 @@ fun CategoryItem(
     val badgeFontSize = rememberBadgeFontSize()
     val badgePadding = rememberBadgePadding()
     
+    // Reduce horizontal padding for smaller font sizes
+    val horizontalPadding = when {
+        bodyFontSize.value <= 14f -> 8.dp   // SMALL
+        bodyFontSize.value <= 16f -> 10.dp  // MEDIUM
+        else -> 16.dp  // LARGE
+    }
+    
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -253,7 +260,7 @@ fun CategoryItem(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = horizontalPadding),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
