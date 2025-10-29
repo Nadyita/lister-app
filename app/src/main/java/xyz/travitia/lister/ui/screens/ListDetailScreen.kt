@@ -255,6 +255,13 @@ fun ItemsList(
             val color = if (isInCart) ListerGray else primaryColor
             val isExpanded = expandedCategories[category] ?: true
 
+            // Add spacing before "IN CART" header
+            if (isInCart) {
+                item(key = "spacer_in_cart") {
+                    Spacer(modifier = Modifier.height(48.dp))
+                }
+            }
+
             item(key = "header_$category") {
                 CategoryHeader(
                     category = category,
