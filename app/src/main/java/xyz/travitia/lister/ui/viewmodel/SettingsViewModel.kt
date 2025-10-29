@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import xyz.travitia.lister.data.model.FontSize
+import xyz.travitia.lister.data.model.PaddingMode
 import xyz.travitia.lister.data.model.PrimaryColor
 import xyz.travitia.lister.data.preferences.SettingsPreferences
 
@@ -17,6 +18,7 @@ data class SettingsUiState(
     val primaryColor: PrimaryColor = PrimaryColor.DEFAULT,
     val useMaterialYou: Boolean = false,
     val fontSize: FontSize = FontSize.DEFAULT,
+    val useCompactMode: Boolean = false,
     val isSaving: Boolean = false
 )
 
@@ -60,6 +62,11 @@ class SettingsViewModel(private val settingsPreferences: SettingsPreferences) : 
                 _uiState.value = _uiState.value.copy(fontSize = size)
             }
         }
+        viewModelScope.launch {
+            settingsPreferences.paddingMode.collect { mode ->
+                _uiState.value = _uiState.value.copy(useCompactMode = mode == PaddingMode.COMPACT)
+            }
+        }
     }
 
     fun saveSettings(
@@ -69,6 +76,7 @@ class SettingsViewModel(private val settingsPreferences: SettingsPreferences) : 
         primaryColor: PrimaryColor,
         useMaterialYou: Boolean,
         fontSize: FontSize,
+        useCompactMode: Boolean,
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
@@ -79,6 +87,7 @@ class SettingsViewModel(private val settingsPreferences: SettingsPreferences) : 
             settingsPreferences.setPrimaryColor(primaryColor)
             settingsPreferences.setUseMaterialYou(useMaterialYou)
             settingsPreferences.setFontSize(fontSize)
+            settingsPreferences.setPaddingMode(if (useCompactMode) PaddingMode.COMPACT else PaddingMode.NORMAL)
             _uiState.value = _uiState.value.copy(isSaving = false)
             onSuccess()
         }

@@ -34,6 +34,7 @@ import xyz.travitia.lister.ui.components.ListActionDialog
 import xyz.travitia.lister.ui.theme.rememberBadgeFontSize
 import xyz.travitia.lister.ui.theme.rememberBadgePadding
 import xyz.travitia.lister.ui.theme.rememberBodyFontSize
+import xyz.travitia.lister.ui.theme.rememberItemVerticalPadding
 import xyz.travitia.lister.ui.viewmodel.ListOverviewViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -313,6 +314,7 @@ fun ListItem(
     val bodyFontSize = rememberBodyFontSize()
     val badgeFontSize = rememberBadgeFontSize()
     val badgePadding = rememberBadgePadding()
+    val verticalPadding = rememberItemVerticalPadding()
     
     Surface(
         shadowElevation = elevation,
@@ -325,7 +327,7 @@ fun ListItem(
                     onClick = onClick,
                     onLongClick = onLongClick
                 )
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = verticalPadding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {

@@ -25,6 +25,7 @@ import xyz.travitia.lister.ui.components.RenameCategoryDialog
 import xyz.travitia.lister.ui.theme.rememberBadgeFontSize
 import xyz.travitia.lister.ui.theme.rememberBadgePadding
 import xyz.travitia.lister.ui.theme.rememberBodyFontSize
+import xyz.travitia.lister.ui.theme.rememberItemVerticalPadding
 import xyz.travitia.lister.ui.viewmodel.CategoryManagementViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -244,6 +245,7 @@ fun CategoryItem(
     val bodyFontSize = rememberBodyFontSize()
     val badgeFontSize = rememberBadgeFontSize()
     val badgePadding = rememberBadgePadding()
+    val verticalPadding = rememberItemVerticalPadding()
     
     // Reduce horizontal padding for smaller font sizes
     val horizontalPadding = when {
@@ -255,12 +257,11 @@ fun CategoryItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .padding(horizontal = horizontalPadding),
+            .padding(horizontal = horizontalPadding, vertical = verticalPadding),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

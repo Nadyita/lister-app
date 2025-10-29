@@ -43,7 +43,9 @@ import xyz.travitia.lister.ui.theme.ListerGreen
 import xyz.travitia.lister.ui.theme.rememberBadgeFontSize
 import xyz.travitia.lister.ui.theme.rememberBadgePadding
 import xyz.travitia.lister.ui.theme.rememberBodyFontSize
+import xyz.travitia.lister.ui.theme.rememberCategoryHeaderVerticalPadding
 import xyz.travitia.lister.ui.theme.rememberHeaderFontSize
+import xyz.travitia.lister.ui.theme.rememberItemVerticalPadding
 import xyz.travitia.lister.ui.viewmodel.ListDetailViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -318,6 +320,7 @@ fun CategoryHeader(
     val cdExpand = stringResource(R.string.cd_expand)
     val cdCollapse = stringResource(R.string.cd_collapse)
     val headerFontSize = rememberHeaderFontSize()
+    val verticalPadding = rememberCategoryHeaderVerticalPadding()
 
     Row(
         modifier = Modifier
@@ -327,7 +330,7 @@ fun CategoryHeader(
                 onClick = onToggle,
                 onLongClick = onLongClick
             )
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = verticalPadding),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -359,6 +362,7 @@ fun ItemRow(
     val bodyFontSize = rememberBodyFontSize()
     val badgeFontSize = rememberBadgeFontSize()
     val badgePadding = rememberBadgePadding()
+    val verticalPadding = rememberItemVerticalPadding()
     
     Row(
         modifier = Modifier
@@ -367,7 +371,7 @@ fun ItemRow(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = verticalPadding),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

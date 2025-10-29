@@ -45,6 +45,8 @@
     <string name="settings_use_material_you">Material You verwenden</string>
     <string name="settings_use_material_you_hint">Verwendet die Systemfarben aus dem Wallpaper (Android 12+)</string>
     <string name="settings_font_size_label">Schriftgröße:</string>
+    <string name="settings_compact_mode_label">Kompakte Ansicht</string>
+    <string name="settings_compact_mode_hint">Reduziert die Abstände zwischen Elementen</string>
     <string name="settings_manage_categories">Kategorien verwalten</string>
     <string name="settings_base_url_hint">Hinweis: Die Base URL sollte mit /api enden.</string>
     <string name="settings_base_url_example">Beispiel: http://192.168.0.1/api</string>

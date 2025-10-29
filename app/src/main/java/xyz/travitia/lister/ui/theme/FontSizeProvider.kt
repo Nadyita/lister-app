@@ -51,3 +51,43 @@ fun rememberBadgePadding(): Dp {
     }
 }
 
+@Composable
+fun rememberItemVerticalPadding(): Dp {
+    val context = LocalContext.current
+    val application = context.applicationContext as ListerApplication
+    val fontSize by application.settingsPreferences.fontSize.collectAsState(initial = FontSize.DEFAULT)
+    val paddingMode by application.settingsPreferences.paddingMode.collectAsState(initial = xyz.travitia.lister.data.model.PaddingMode.DEFAULT)
+    
+    val normalPadding = when (fontSize) {
+        FontSize.SMALL -> 12.dp
+        FontSize.MEDIUM -> 16.dp
+        FontSize.LARGE -> 20.dp
+    }
+    
+    return if (paddingMode == xyz.travitia.lister.data.model.PaddingMode.COMPACT) {
+        normalPadding * 0.6f
+    } else {
+        normalPadding
+    }
+}
+
+@Composable
+fun rememberCategoryHeaderVerticalPadding(): Dp {
+    val context = LocalContext.current
+    val application = context.applicationContext as ListerApplication
+    val fontSize by application.settingsPreferences.fontSize.collectAsState(initial = FontSize.DEFAULT)
+    val paddingMode by application.settingsPreferences.paddingMode.collectAsState(initial = xyz.travitia.lister.data.model.PaddingMode.DEFAULT)
+    
+    val normalPadding = when (fontSize) {
+        FontSize.SMALL -> 8.dp
+        FontSize.MEDIUM -> 12.dp
+        FontSize.LARGE -> 16.dp
+    }
+    
+    return if (paddingMode == xyz.travitia.lister.data.model.PaddingMode.COMPACT) {
+        normalPadding * 0.6f
+    } else {
+        normalPadding
+    }
+}
+

@@ -39,17 +39,19 @@ fun SettingsScreen(
     var selectedColor by remember { mutableStateOf(uiState.primaryColor) }
     var useMaterialYou by remember { mutableStateOf(uiState.useMaterialYou) }
     var selectedFontSize by remember { mutableStateOf(uiState.fontSize) }
+    var useCompactMode by remember { mutableStateOf(uiState.useCompactMode) }
 
     val isMaterialYouAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     LaunchedEffect(uiState.baseUrl, uiState.bearerToken, uiState.suggestionCount, uiState.primaryColor,
-        uiState.useMaterialYou, uiState.fontSize) {
+        uiState.useMaterialYou, uiState.fontSize, uiState.useCompactMode) {
         baseUrl = uiState.baseUrl
         bearerToken = uiState.bearerToken
         suggestionCount = uiState.suggestionCount.toString()
         selectedColor = uiState.primaryColor
         useMaterialYou = uiState.useMaterialYou
         selectedFontSize = uiState.fontSize
+        useCompactMode = uiState.useCompactMode
     }
 
     Scaffold(
@@ -218,10 +220,34 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.settings_compact_mode_label),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                    Text(
+                        text = stringResource(R.string.settings_compact_mode_hint),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                Switch(
+                    checked = useCompactMode,
+                    onCheckedChange = { useCompactMode = it }
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Button(
                 onClick = {
                     val count = suggestionCount.toIntOrNull() ?: 3
-                    viewModel.saveSettings(baseUrl, bearerToken, count, selectedColor, useMaterialYou, selectedFontSize) {
+                    viewModel.saveSettings(baseUrl, bearerToken, count, selectedColor, useMaterialYou, selectedFontSize, useCompactMode) {
                         onNavigateBack()
                     }
                 },
