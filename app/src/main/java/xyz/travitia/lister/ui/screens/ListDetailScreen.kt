@@ -21,9 +21,13 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.swiperefresh.SwipeRefresh
@@ -370,7 +374,19 @@ fun RenameCategoryDialog(
     onDismiss: () -> Unit,
     onSave: (String) -> Unit
 ) {
-    var categoryName by remember { mutableStateOf(currentName) }
+    var categoryName by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = currentName,
+                selection = TextRange(currentName.length)
+            )
+        )
+    }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -383,15 +399,17 @@ fun RenameCategoryDialog(
                     value = categoryName,
                     onValueChange = { categoryName = it },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (categoryName.isNotBlank() && categoryName != currentName) {
-                        onSave(categoryName)
+                    if (categoryName.text.isNotBlank() && categoryName.text != currentName) {
+                        onSave(categoryName.text)
                     }
                 }
             ) {

@@ -4,7 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import xyz.travitia.lister.R
 
@@ -14,6 +18,11 @@ fun CreateListDialog(
     onCreate: (String) -> Unit
 ) {
     var listName by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -26,7 +35,9 @@ fun CreateListDialog(
                     value = listName,
                     onValueChange = { listName = it },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
             }
         },
@@ -55,7 +66,19 @@ fun EditListDialog(
     onDismiss: () -> Unit,
     onSave: (String) -> Unit
 ) {
-    var listName by remember { mutableStateOf(currentName) }
+    var listName by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = currentName,
+                selection = TextRange(currentName.length)
+            )
+        )
+    }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -68,15 +91,17 @@ fun EditListDialog(
                     value = listName,
                     onValueChange = { listName = it },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (listName.isNotBlank()) {
-                        onSave(listName)
+                    if (listName.text.isNotBlank()) {
+                        onSave(listName.text)
                     }
                 }
             ) {

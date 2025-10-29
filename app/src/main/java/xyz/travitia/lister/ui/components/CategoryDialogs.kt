@@ -4,7 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import xyz.travitia.lister.R
 import xyz.travitia.lister.data.model.CategoryWithCount
@@ -15,7 +19,19 @@ fun RenameCategoryDialog(
     onDismiss: () -> Unit,
     onSave: (String) -> Unit
 ) {
-    var categoryName by remember { mutableStateOf(currentName) }
+    var categoryName by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = currentName,
+                selection = TextRange(currentName.length)
+            )
+        )
+    }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -28,15 +44,17 @@ fun RenameCategoryDialog(
                     value = categoryName,
                     onValueChange = { categoryName = it },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
             }
         },
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (categoryName.isNotBlank()) {
-                        onSave(categoryName)
+                    if (categoryName.text.isNotBlank()) {
+                        onSave(categoryName.text)
                     }
                 }
             ) {

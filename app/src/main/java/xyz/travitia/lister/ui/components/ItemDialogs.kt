@@ -7,8 +7,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import xyz.travitia.lister.R
 import xyz.travitia.lister.data.model.CreateItemRequest
@@ -30,6 +34,11 @@ fun CreateItemDialog(
     var category by remember { mutableStateOf("") }
     var showItemSuggestions by remember { mutableStateOf(false) }
     var showCategorySuggestions by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     val filteredItemSuggestions = remember(itemName, suggestions, suggestionCount) {
         if (itemName.isNotBlank()) {
@@ -69,7 +78,9 @@ fun CreateItemDialog(
                         showItemSuggestions = it.isNotBlank()
                     },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
 
                 if (showItemSuggestions && filteredItemSuggestions.isNotEmpty()) {
@@ -190,7 +201,14 @@ fun EditItemDialog(
     onDismiss: () -> Unit,
     onSave: (UpdateItemRequest) -> Unit
 ) {
-    var itemName by remember { mutableStateOf(item.name) }
+    var itemName by remember {
+        mutableStateOf(
+            TextFieldValue(
+                text = item.name,
+                selection = TextRange(item.name.length)
+            )
+        )
+    }
     var amount by remember {
         mutableStateOf(
             item.amount?.let { amt ->
@@ -205,6 +223,11 @@ fun EditItemDialog(
     var unit by remember { mutableStateOf(item.amountUnit ?: "") }
     var category by remember { mutableStateOf(item.category ?: "") }
     var showCategorySuggestions by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     val filteredCategorySuggestions = remember(category, categorySuggestions, suggestionCount) {
         val filtered = if (category.isNotBlank()) {
@@ -226,7 +249,9 @@ fun EditItemDialog(
                     value = itemName,
                     onValueChange = { itemName = it },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -293,11 +318,11 @@ fun EditItemDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (itemName.isNotBlank()) {
+                    if (itemName.text.isNotBlank()) {
                         val parsedAmount = if (amount.isBlank()) null else amount.toDoubleOrNull()
                         onSave(
                             UpdateItemRequest(
-                                name = itemName,
+                                name = itemName.text,
                                 amount = parsedAmount,
                                 amountUnit = if (parsedAmount == null) null else (if (unit.isBlank()) null else unit),
                                 category = if (category.isBlank()) null else category
