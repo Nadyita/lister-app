@@ -218,7 +218,8 @@ fun ListOverviewScreen(
                         
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            state = lazyListState
+                            state = lazyListState,
+                            contentPadding = PaddingValues(bottom = if (uiState.isReorderMode) 80.dp else 0.dp)
                         ) {
                             items(
                                 items = displayLists,
