@@ -25,6 +25,7 @@ fun CreateItemDialog(
     categorySuggestions: List<String>,
     categoryMappings: Map<String, String?>,
     suggestionCount: Int = 3,
+    errorMessage: String? = null,
     onDismiss: () -> Unit,
     onCreate: (CreateItemRequest) -> Unit
 ) {
@@ -165,6 +166,15 @@ fun CreateItemDialog(
                         }
                     }
                 }
+
+                errorMessage?.let { error ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         },
         confirmButton = {
@@ -198,6 +208,7 @@ fun EditItemDialog(
     item: Item,
     categorySuggestions: List<String>,
     suggestionCount: Int = 3,
+    errorMessage: String? = null,
     onDismiss: () -> Unit,
     onSave: (UpdateItemRequest) -> Unit
 ) {
@@ -312,6 +323,15 @@ fun EditItemDialog(
                             }
                         }
                     }
+                }
+
+                errorMessage?.let { error ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
             }
         },

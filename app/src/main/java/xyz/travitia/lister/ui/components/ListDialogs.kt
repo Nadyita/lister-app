@@ -14,6 +14,7 @@ import xyz.travitia.lister.R
 
 @Composable
 fun CreateListDialog(
+    errorMessage: String? = null,
     onDismiss: () -> Unit,
     onCreate: (String) -> Unit
 ) {
@@ -39,6 +40,15 @@ fun CreateListDialog(
                         .fillMaxWidth()
                         .focusRequester(focusRequester)
                 )
+
+                errorMessage?.let { error ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         },
         confirmButton = {
@@ -63,6 +73,7 @@ fun CreateListDialog(
 @Composable
 fun EditListDialog(
     currentName: String,
+    errorMessage: String? = null,
     onDismiss: () -> Unit,
     onSave: (String) -> Unit
 ) {
@@ -95,6 +106,15 @@ fun EditListDialog(
                         .fillMaxWidth()
                         .focusRequester(focusRequester)
                 )
+
+                errorMessage?.let { error ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         },
         confirmButton = {

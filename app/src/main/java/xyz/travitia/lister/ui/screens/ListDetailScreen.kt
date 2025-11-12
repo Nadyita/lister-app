@@ -38,6 +38,7 @@ import xyz.travitia.lister.R
 import xyz.travitia.lister.data.model.Item
 import xyz.travitia.lister.ui.components.CreateItemDialog
 import xyz.travitia.lister.ui.components.EditItemDialog
+import xyz.travitia.lister.ui.components.RenameCategoryDialog
 import xyz.travitia.lister.ui.theme.ListerGray
 import xyz.travitia.lister.ui.theme.ListerGreen
 import xyz.travitia.lister.ui.theme.rememberBadgeFontSize
@@ -190,10 +191,15 @@ fun ListDetailScreen(
             categorySuggestions = uiState.categorySuggestions,
             categoryMappings = uiState.categoryMappings,
             suggestionCount = uiState.suggestionCount,
-            onDismiss = { showCreateDialog = false },
+            errorMessage = uiState.error,
+            onDismiss = {
+                showCreateDialog = false
+                viewModel.clearError()
+            },
             onCreate = { request ->
                 viewModel.createItem(request) {
                     showCreateDialog = false
+                    viewModel.clearError()
                 }
             }
         )
@@ -204,10 +210,15 @@ fun ListDetailScreen(
             item = item,
             categorySuggestions = uiState.categorySuggestions,
             suggestionCount = uiState.suggestionCount,
-            onDismiss = { editingItem = null },
+            errorMessage = uiState.error,
+            onDismiss = {
+                editingItem = null
+                viewModel.clearError()
+            },
             onSave = { request ->
                 viewModel.updateItem(item.id, request) {
                     editingItem = null
+                    viewModel.clearError()
                 }
             }
         )
@@ -216,10 +227,15 @@ fun ListDetailScreen(
     renamingCategory?.let { categoryName ->
         RenameCategoryDialog(
             currentName = categoryName,
-            onDismiss = { renamingCategory = null },
+            errorMessage = uiState.error,
+            onDismiss = {
+                renamingCategory = null
+                viewModel.clearError()
+            },
             onSave = { newName ->
                 viewModel.renameCategory(categoryName, newName) {
                     renamingCategory = null
+                    viewModel.clearError()
                 }
             }
         )

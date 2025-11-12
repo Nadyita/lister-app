@@ -256,10 +256,15 @@ fun ListOverviewScreen(
 
     if (showCreateDialog) {
         CreateListDialog(
-            onDismiss = { showCreateDialog = false },
+            errorMessage = uiState.error,
+            onDismiss = {
+                showCreateDialog = false
+                viewModel.clearError()
+            },
             onCreate = { name ->
                 viewModel.createList(name) {
                     showCreateDialog = false
+                    viewModel.clearError()
                 }
             }
         )
@@ -283,10 +288,15 @@ fun ListOverviewScreen(
     showEditDialog?.let { list ->
         EditListDialog(
             currentName = list.name,
-            onDismiss = { showEditDialog = null },
+            errorMessage = uiState.error,
+            onDismiss = {
+                showEditDialog = null
+                viewModel.clearError()
+            },
             onSave = { newName ->
                 viewModel.updateList(list.id, newName) {
                     showEditDialog = null
+                    viewModel.clearError()
                 }
             }
         )

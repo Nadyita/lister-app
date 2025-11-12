@@ -1,6 +1,7 @@
 package xyz.travitia.lister.data.repository
 
 import android.util.Log
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.first
 import retrofit2.Response
 import xyz.travitia.lister.data.model.*
@@ -12,6 +13,8 @@ class ListerRepository(private val settingsPreferences: SettingsPreferences) {
     companion object {
         private const val TAG = "ListerRepository"
     }
+
+    private val gson = Gson()
 
     private suspend fun getApiService() = ApiClient.getApiService(
         settingsPreferences.baseUrl.first(),
@@ -38,9 +41,20 @@ class ListerRepository(private val settingsPreferences: SettingsPreferences) {
                     Result.failure(Exception(error))
                 }
             } else {
-                val error = "API Error: ${response.code()} - ${response.message()}"
-                Log.e(TAG, error)
-                Result.failure(Exception(error))
+                val errorMessage = try {
+                    val errorBody = response.errorBody()?.string()
+                    if (!errorBody.isNullOrBlank()) {
+                        val errorResponse = gson.fromJson(errorBody, ErrorResponse::class.java)
+                        errorResponse?.error ?: "API Error: ${response.code()} - ${response.message()}"
+                    } else {
+                        "API Error: ${response.code()} - ${response.message()}"
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error parsing error response: ${e.message}")
+                    "API Error: ${response.code()} - ${response.message()}"
+                }
+                Log.e(TAG, errorMessage)
+                Result.failure(Exception(errorMessage))
             }
         } catch (e: Exception) {
             Log.e(TAG, "API Exception: ${e.message}", e)

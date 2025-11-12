@@ -210,10 +210,15 @@ fun CategoryManagementScreen(
     showRenameDialog?.let { category ->
         RenameCategoryDialog(
             currentName = category.name,
-            onDismiss = { showRenameDialog = null },
+            errorMessage = uiState.error,
+            onDismiss = {
+                showRenameDialog = null
+                viewModel.clearError()
+            },
             onSave = { newName ->
                 viewModel.renameCategory(category.id, newName) {
                     showRenameDialog = null
+                    viewModel.clearError()
                 }
             }
         )

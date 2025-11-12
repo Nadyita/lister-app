@@ -16,6 +16,7 @@ import xyz.travitia.lister.data.model.CategoryWithCount
 @Composable
 fun RenameCategoryDialog(
     currentName: String,
+    errorMessage: String? = null,
     onDismiss: () -> Unit,
     onSave: (String) -> Unit
 ) {
@@ -48,6 +49,15 @@ fun RenameCategoryDialog(
                         .fillMaxWidth()
                         .focusRequester(focusRequester)
                 )
+
+                errorMessage?.let { error ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             }
         },
         confirmButton = {
